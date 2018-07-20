@@ -1,0 +1,28 @@
+{
+  "name": "IconCaptcha_Front-End",
+  "version": "2.3.1",
+  "description": "IconCaptcha is a fast, simple and user-friendly captcha for PHP and ASP.NET.",
+  "main": "gulpfile.js",
+  "scripts": {
+    "gulp": "gulp"
+  },
+  "author": "Fabian Wennink",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabianwennink/IconCaptcha-Plugin-Front-End.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+	"babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-babel-minify": "^0.4.3",
+    "gulp-combine-mq": "^0.4.0",
+    "gulp-csso": "^3.0.1",
+    "gulp-sass": "^4.0.1",
+	"gulp-rename": "^1.3.0"
+  }
+}

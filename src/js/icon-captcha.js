@@ -10,7 +10,7 @@
         iconCaptcha: function(options) {
 
             // Default plugin options, will be ignored if not set
-            var defaults = {
+            let defaults = {
                 captchaTheme: [''],
                 captchaFontFamily: '',
                 captchaClickDelay: 1000,
@@ -19,7 +19,7 @@
                 enableLoadingAnimation: false,
                 loadingAnimationDelay: 2000,
                 requestIconsDelay: 1500,
-                captchaAjaxFile: '../php/captcha-request.php',
+                captchaAjaxFile: '',
                 captchaMessages: {
                     header: 'Select the image that does not belong in the row',
                     correct: {
@@ -33,25 +33,35 @@
                 }
             };
 
-            var $options =  $.extend(defaults, options);
+            let $options =  $.extend(defaults, options);
 
             // Loop through all the captcha holder.
             return this.each(function(id) {
 
-                var $holder = $(this);
-                var $captcha_id = id;
+                let $holder = $(this);
+                let $captcha_id = id;
 
-                var build_time = 0;
-                var hovering = false;
-                var generated = false;
-                var images_ready = 0;
+                let build_time = 0;
+                let hovering = false;
+                let generated = false;
+                let images_ready = 0;
 
+				// Make sure the captchaAjaxFile is set.
+				if(!$options.captchaAjaxFile) {
+					console.error('IconCaptcha: The option captchaAjaxFile has not been set.');
+
+					// Trigger: error
+                    $holder.trigger('error', [{captcha_id: $captcha_id}]);
+
+                    return;
+				}
+				
                 // Build the captcha
                 buildCaptcha(false);
 
                 // Create random form
                 function buildCaptcha(loaderActive) {
-                    var captchaTheme = 'light';
+                    let captchaTheme = 'light';
 
                     if($options.captchaTheme[$captcha_id] !== undefined && ($options.captchaTheme[$captcha_id] === 'dark' || $options.captchaTheme[$captcha_id] === 'light')) {
                         captchaTheme = $options.captchaTheme[$captcha_id].toLowerCase();
@@ -66,7 +76,7 @@
                     if(!generated)
                         _buildCaptchaHolder();
 
-                    var $icon_holder = $holder.find('.captcha-modal__icons');
+                    let $icon_holder = $holder.find('.captcha-modal__icons');
 
                     // If the requestIconsDelay has been set and is not 0, add the loading delay.
                     // The loading delay will (possibly) prevent high CPU usage when a page displaying
@@ -126,10 +136,10 @@
                     if($options.captchaFontFamily) {
                         $holder.css('font-family', $options.captchaFontFamily);
                     } else {
-                        $('body').append('<!-- Icon Captcha default font --><link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">');
+                        $holder.css('font-family', 'Arial, sans-serif');
                     }
 
-                    var captchaHTML = [];
+                    let captchaHTML = [];
 
                     // Adds the first portion of the HTML to the array.
                     captchaHTML.push(
@@ -148,7 +158,7 @@
 
                     // If the credits option is enabled, push the HTML to the array.
                     if($options.showCredits === 'show' || $options.showCredits === 'hide') {
-                        var className = 'captcha-modal__credits' + (($options.showCredits === 'hide') ? ' captcha-modal__credits--hide' : '');
+                        let className = 'captcha-modal__credits' + (($options.showCredits === 'hide') ? ' captcha-modal__credits--hide' : '');
 
                         captchaHTML.push(
                             "<div class='" + className + "' title='IconCaptcha by Fabian Wennink'>",
@@ -169,7 +179,7 @@
 
                 // Submit the captcha
                 function submitCaptcha(captcha) {
-                    var clicked_class = captcha.attr('icon-hash');
+                    let clicked_class = captcha.attr('icon-hash');
 
                     if(clicked_class) {
                         $holder.find('input[name="captcha-hf"]').attr('value', clicked_class);
@@ -241,8 +251,8 @@
                 // Wait for the icon to fully load.
                 // When all 5 icons are loaded, remove the loading animation.
                 function loadImage(image, iconHolder) {
-                    var url = image.css('background-image').match(/\((.*?)\)/)[1].replace(/('|")/g,'');
-                    var img = new Image();
+                    let url = image.css('background-image').match(/\((.*?)\)/)[1].replace(/('|")/g,'');
+                    let img = new Image();
 
                     // Listen to the image loading event
                     img.onload = function() {
@@ -286,12 +296,12 @@
                         return;
 
                     // Detect if the click coordinates. If not present, it's not a real click.
-                    var _x = (e.pageX - $(e.target).offset().left),
+                    let _x = (e.pageX - $(e.target).offset().left),
                         _y = (e.pageY - $(e.target).offset().top);
                     if(!_x || !_y) return;
 
-                    var $form = $(this);
-                    var $icon_holder = $holder.find('.captcha-modal__icons');
+                    let $form = $(this);
+                    let $icon_holder = $holder.find('.captcha-modal__icons');
 
                     // If an image is clicked, do not allow clicking again until the form has reset
                     if($icon_holder.hasClass('captcha-opacity')) return;

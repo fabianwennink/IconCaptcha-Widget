@@ -63,7 +63,6 @@
             text-align: center;
             -webkit-box-align: center;
             -webkit-box-pack: center;
-            display: -webkit-box;
             -webkit-box-sizing: initial;
             -moz-box-sizing: initial;
             box-sizing: initial;
@@ -92,7 +91,7 @@
             .captcha-image {
                 position: relative;
                 height: 50px;
-                width: 19%;
+                width: 20%;
                 float: left;
                 background-repeat: no-repeat;
                 background-position: 50% 50%;

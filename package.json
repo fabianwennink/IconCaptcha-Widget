@@ -1,6 +1,6 @@
 {
   "name": "IconCaptcha_Front-End",
-  "version": "2.3.1",
+  "version": "2.4.1",
   "description": "IconCaptcha is a fast, simple and user-friendly captcha for PHP and ASP.NET.",
   "main": "gulpfile.js",
   "scripts": {

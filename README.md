@@ -1,6 +1,6 @@
 # IconCaptcha Plugin - Front-End Package
 
-[![Version](https://img.shields.io/badge/Version-2.4.0-orange.svg?style=flat-square)]() [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]() [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg?style=flat-square)]()
+[![Version](https://img.shields.io/badge/Version-2.4.1-orange.svg?style=flat-square)]() [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]() [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg?style=flat-square)]()
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellow.svg?style=flat-square)](https://paypal.me/nlgamevideosnl)
 
 <br><img src="http://i.imgur.com/RMUALSz.png" />

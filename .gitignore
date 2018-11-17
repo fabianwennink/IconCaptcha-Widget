@@ -1,3 +1,6 @@
+### SonarQube ###
+.scannerwork/
+
 ### JetBrains IDE ###
 .idea/
 

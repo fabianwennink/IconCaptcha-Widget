@@ -1,7 +1,11 @@
 # IconCaptcha Plugin - Front-End Package
 
-[![Version](https://img.shields.io/badge/Version-2.4.1-orange.svg?style=flat-square)]() [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]() [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg?style=flat-square)]()
+[![Version](https://img.shields.io/badge/Version-2.5.0-orange.svg?style=flat-square)]() [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]() [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg?style=flat-square)]()
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellow.svg?style=flat-square)](https://paypal.me/nlgamevideosnl)
+
+[![Sonar Quality](https://sonarcloud.io/api/project_badges/measure?project=fabianwennink_IconCaptcha-Plugin-Front-End&metric=alert_status)]() 
+[![Sonar Security](https://sonarcloud.io/api/project_badges/measure?project=fabianwennink_IconCaptcha-Plugin-Front-End&metric=security_rating)]()
+[![Sonar Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=fabianwennink_IconCaptcha-Plugin-Front-End&metric=vulnerabilities)]()
 
 <br><img src="http://i.imgur.com/RMUALSz.png" />
 
@@ -26,6 +30,7 @@ __Gulp:__
 - To watch only the SCSS files: ```gulp scss:watch```
 - To watch only the JavaScript files: ```gulp js:watch```
 - To combine the media queries in the minified CSS file: ```gulp query:css```
+- To build the source code: ```gulp build```
 
 ## Credits
 The icons used in this project are made by <a href="https://www.webalys.com" target="_blank" rel="nofollow">Webalys</a>.

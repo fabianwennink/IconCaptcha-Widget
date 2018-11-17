@@ -1,9 +1,11 @@
 /**
- * Icon Captcha Plugin: v2.4.1
+ * Icon Captcha Plugin: v2.5.0
  * Copyright © 2017, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
  */
+
+//# sourceMappingURL=icon-captcha.min.js.map
 (function($){
 
     $.fn.extend({
@@ -11,16 +13,17 @@
 
             // Default plugin options, will be ignored if not set
             let defaults = {
-                captchaTheme: [''],
-                captchaFontFamily: '',
-                captchaClickDelay: 1000,
-                captchaHoverDetection: true,
+                themes: [''],
+                fontFamily: '',
+                clickDelay: 1000,
+                invalidResetDelay: 3000,
+                hoverDetection: true,
                 showCredits: 'show',
                 enableLoadingAnimation: false,
                 loadingAnimationDelay: 2000,
                 requestIconsDelay: 1500,
-                captchaAjaxFile: '',
-                captchaMessages: {
+                validationPath: '',
+                messages: {
                     header: 'Select the image that does not belong in the row',
                     correct: {
                         top: 'Great!',
@@ -47,7 +50,7 @@
                 let images_ready = 0;
 
 				// Make sure the captchaAjaxFile is set.
-				if(!$options.captchaAjaxFile) {
+				if(!$options.validationPath) {
 					console.error('IconCaptcha: The option captchaAjaxFile has not been set.');
 
 					// Trigger: error
@@ -56,15 +59,19 @@
                     return;
 				}
 				
-                // Build the captcha
-                buildCaptcha(false);
+                // Initialize the captcha
+                initCaptcha(false);
 
-                // Create random form
-                function buildCaptcha(loaderActive) {
+                /**
+                 * Initialize the captcha.
+                 *
+                 * @param {boolean} loaderActive If the loading animation should play.
+                 */
+                function initCaptcha(loaderActive) {
                     let captchaTheme = 'light';
 
-                    if($options.captchaTheme[$captcha_id] !== undefined && ($options.captchaTheme[$captcha_id] === 'dark' || $options.captchaTheme[$captcha_id] === 'light')) {
-                        captchaTheme = $options.captchaTheme[$captcha_id].toLowerCase();
+                    if($options.themes[$captcha_id] !== undefined && ($options.themes[$captcha_id] === 'dark' || $options.themes[$captcha_id] === 'light')) {
+                        captchaTheme = $options.themes[$captcha_id].toLowerCase();
                     }
 
                     // Reset image loading count
@@ -96,9 +103,17 @@
                     }
                 }
 
+                /**
+                 * Load the captcha by playing the animations and requesting
+                 * the catpcha icons from the back-end server.
+                 *
+                 * @param {string} captchaTheme The theme of the captcha.
+                 * @param iconHolder The captcha holder element.
+                 * @param {boolean} loadDelay If the loading animation should play.
+                 */
                 function loadCaptcha(captchaTheme, iconHolder, loadDelay) {
                     $.ajax({
-                        url: $options.captchaAjaxFile,
+                        url: $options.validationPath,
                         type: 'post',
 						dataType: 'json',
                         data: {cID: $captcha_id, rT : 1, tM: captchaTheme},
@@ -112,7 +127,7 @@
                                 build_time = new Date();
 
                                 $holder.find('.captcha-image').each(function(i) {
-                                    $(this).css('background-image', 'url(' + $options.captchaAjaxFile + '?cid=' + $captcha_id + '&hash=' + data[i] + ')');
+                                    $(this).css('background-image', 'url(' + $options.validationPath + '?cid=' + $captcha_id + '&hash=' + data[i] + ')');
                                     $(this).attr('icon-hash', data[i]);
 
                                     loadImage($(this), iconHolder);
@@ -131,10 +146,16 @@
                     });
                 }
 
-                // Build the form
+                /**
+                 * Build the captcha's holder element.
+                 * The modal will be inserted, along with hidden fields
+                 * which will be used during validation.
+                 *
+                 * @private
+                 */
                 function _buildCaptchaHolder() {
-                    if($options.captchaFontFamily) {
-                        $holder.css('font-family', $options.captchaFontFamily);
+                    if($options.fontFamily) {
+                        $holder.css('font-family', $options.fontFamily);
                     } else {
                         $holder.css('font-family', 'Arial, sans-serif');
                     }
@@ -145,7 +166,7 @@
                     captchaHTML.push(
                         "<div class='captcha-modal'>",
                         "<div class='captcha-modal__header'>",
-                        "<span>" + (($options.captchaMessages.header && $options.captchaMessages.header) ? $options.captchaMessages.header : "Select the image that does not belong in the row") + "</span>",
+                        "<span>" + (($options.messages.header) ? $options.messages.header : "Select the image that does not belong in the row") + "</span>",
                         "</div>",
                         "<div class='captcha-modal__icons'>",
                         "<div class='captcha-image'></div>",
@@ -177,18 +198,21 @@
                     $holder.html(captchaHTML.join('')).attr('data-captcha-id', $captcha_id);
                 }
 
-                // Submit the captcha
-                function submitCaptcha(captcha) {
-                    let clicked_class = captcha.attr('icon-hash');
-
-                    if(clicked_class) {
-                        $holder.find('input[name="captcha-hf"]').attr('value', clicked_class);
+                /**
+                 * Will be called when an icon is selected.
+                 * The user's input will be validated by the back-end server.
+                 *
+                 * @param iconHash The hash of the selected icon.
+                 */
+                function submitCaptcha(iconHash) {
+                    if(iconHash) {
+                        $holder.find('input[name="captcha-hf"]').attr('value', iconHash);
                         $holder.find('input[name="captcha-idhf"]').attr('value', $captcha_id);
 
                         $.ajax({
-                            url: $options.captchaAjaxFile,
-                            type: 'post',
-                            data: {cID: $captcha_id, pC: clicked_class, rT : 2},
+                            url: $options.validationPath,
+                            type: 'POST',
+                            data: {cID: $captcha_id, pC: iconHash, rT : 2},
                             success: function () {
                                 showSuccess();
                             },
@@ -199,33 +223,39 @@
                     }
                 }
 
-                // Show the success popup
+                /**
+                 * Show the success message.
+                 */
                 function showSuccess() {
                     $holder.find('.captcha-modal__icons').empty();
 
                     $holder.addClass('captcha-success');
-                    $holder.find('.captcha-modal__icons').html('<div class="captcha-modal__icons-title">' + (($options.captchaMessages.correct && $options.captchaMessages.correct.top) ? $options.captchaMessages.correct.top : 'Great!')
-                        + '</div><div class="captcha-modal__icons-subtitle">' + (($options.captchaMessages.correct && $options.captchaMessages.correct.bottom) ? $options.captchaMessages.correct.bottom : 'You do not appear to be a robot.') + '</div>');
+                    $holder.find('.captcha-modal__icons').html('<div class="captcha-modal__icons-title">' + (($options.messages.correct && $options.messages.correct.top) ? $options.messages.correct.top : 'Great!')
+                        + '</div><div class="captcha-modal__icons-subtitle">' + (($options.messages.correct && $options.messages.correct.bottom) ? $options.messages.correct.bottom : 'You do not appear to be a robot.') + '</div>');
 
                     // Trigger: success
                     $holder.trigger("success", [{captcha_id: $captcha_id}]);
                 }
 
-                // Show the error popup
+                /**
+                 * Show the error message.
+                 */
                 function showError() {
                     $holder.find('.captcha-modal__icons').empty();
 
                     $holder.addClass('captcha-error');
-                    $holder.find('.captcha-modal__icons').html('<div class="captcha-modal__icons-title">' + (($options.captchaMessages.incorrect && $options.captchaMessages.incorrect.top) ? $options.captchaMessages.incorrect.top : 'Oops!')
-                        + '</div><div class="captcha-modal__icons-subtitle">' + (($options.captchaMessages.incorrect && $options.captchaMessages.incorrect.bottom) ? $options.captchaMessages.incorrect.bottom : 'You\'ve selected the wrong image.') + '</div>');
+                    $holder.find('.captcha-modal__icons').html('<div class="captcha-modal__icons-title">' + (($options.messages.incorrect && $options.messages.incorrect.top) ? $options.messages.incorrect.top : 'Oops!')
+                        + '</div><div class="captcha-modal__icons-subtitle">' + (($options.messages.incorrect && $options.messages.incorrect.bottom) ? $options.messages.incorrect.bottom : 'You\'ve selected the wrong image.') + '</div>');
 
                     // Trigger: error
                     $holder.trigger('error', [{captcha_id: $captcha_id}]);
 
-                    setTimeout(resetCaptcha, 3000);
+                    setTimeout(resetCaptcha, $options.invalidResetDelay);
                 }
 
-                // Reset the captcha
+                /**
+                 * Reset the captcha and rebuild it.
+                 */
                 function resetCaptcha() {
                     $holder.removeClass('captcha-error');
                     $holder.find("input[name='captcha-hf']").attr('value', null);
@@ -242,14 +272,19 @@
                     $holder.find('.captcha-modal__icons > .captcha-image').attr('icon-hash', null);
 
                     // Rebuild the captcha
-                    buildCaptcha(true);
+                    initCaptcha(true);
 
                     // Trigger: refreshed
                     $holder.trigger('refreshed', [{captcha_id: $captcha_id}]);
                 }
 
-                // Wait for the icon to fully load.
-                // When all 5 icons are loaded, remove the loading animation.
+                /**
+                 * Load the requested icon and wait for it to fully load.
+                 * When all 5 icons are loaded, remove the loading animation.
+                 *
+                 * @param image The image to load.
+                 * @param iconHolder The captcha holder element.
+                 */
                 function loadImage(image, iconHolder) {
                     let url = image.css('background-image').match(/\((.*?)\)/)[1].replace(/('|")/g,'');
                     let img = new Image();
@@ -272,13 +307,21 @@
                     if (img.complete) img.onload();
                 }
 
-                // Add the loading animation to the captcha holder
+                /**
+                 * Add the loading animation to the captcha holder
+                 *
+                 * @param iconHolder The captcha holder element.
+                 */
                 function addLoader(iconHolder) {
                     iconHolder.addClass('captcha-opacity');
                     iconHolder.prepend('<div class="captcha-loader"></div>');
                 }
 
-                // Remove the loading animation from the captcha holder
+                /**
+                 * Remove the loading animation from the captcha holder
+                 *
+                 * @param iconHolder The captcha holder element.
+                 */
                 function removeLoader(iconHolder) {
                     iconHolder.removeClass('captcha-opacity');
                     iconHolder.find('.captcha-loader').remove();
@@ -288,35 +331,36 @@
                 $holder.on('click', '.captcha-modal__icons > .captcha-image', function(e) {
 
                     // Only allow a user to click after 1.5 seconds
-                    if((new Date() - build_time) <= $options.captchaClickDelay)
+                    if((new Date() - build_time) <= $options.clickDelay)
                         return;
 
                     // if the cursor is not hovering over the element, return
-                    if($options.captchaHoverDetection && !hovering)
+                    if($options.hoverDetection && !hovering)
                         return;
 
                     // Detect if the click coordinates. If not present, it's not a real click.
                     let _x = (e.pageX - $(e.target).offset().left),
                         _y = (e.pageY - $(e.target).offset().top);
-                    if(!_x || !_y) return;
+                    if(!_x || !_y)
+                        return;
 
-                    let $form = $(this);
-                    let $icon_holder = $holder.find('.captcha-modal__icons');
+                    let iconHash = $(this).attr('icon-hash');
+                    let iconHolder = $holder.find('.captcha-modal__icons');
 
                     // If an image is clicked, do not allow clicking again until the form has reset
-                    if($icon_holder.hasClass('captcha-opacity')) return;
+                    if(iconHolder.hasClass('captcha-opacity')) return;
 
                     // Trigger: selected
                     $holder.trigger('selected', [{captcha_id: $captcha_id}]);
 
                     if($options.enableLoadingAnimation === true) {
-                        addLoader($icon_holder);
+                        addLoader(iconHolder);
 
                         setTimeout(function() {
-                            submitCaptcha($form);
+                            submitCaptcha(iconHash);
                         }, $options.loadingAnimationDelay);
                     } else {
-                        submitCaptcha($form);
+                        submitCaptcha(iconHash);
                     }
                 }).on({
                         mouseenter: function() {

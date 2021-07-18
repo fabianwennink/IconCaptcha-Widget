@@ -1,28 +1,34 @@
 {
-  "name": "IconCaptcha_Front-End",
-  "version": "2.5.0",
+  "name": "iconcaptcha-plugin-front-end",
+  "version": "3.0.0",
   "description": "IconCaptcha is a fast, simple and user-friendly captcha for PHP and ASP.NET.",
   "main": "gulpfile.js",
   "scripts": {
-    "gulp": "gulp"
+    "gulp": "gulp",
+    "watch": "gulp watch"
   },
   "author": "Fabian Wennink",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fabianwennink/IconCaptcha-Plugin-Front-End.git"
+    "url": "https://github.com/fabianwennink/IconCaptcha-Plugin-Front-End.git"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.1",
-    "gulp-babel-minify": "^0.4.3",
-    "gulp-combine-mq": "^0.4.0",
-    "gulp-csso": "^3.0.1",
-    "gulp-rename": "^1.4.0",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.4"
-  }
+    "@babel/core": "^7.14.2",
+    "@babel/preset-env": "^7.14.2",
+    "babelify": "^10.0.0",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-babel-minify": "^0.5.1",
+    "gulp-postcss": "^9.0.0",
+    "gulp-sass": "^4.1.0",
+    "gulp-rename": "^2.0.0",
+    "autoprefixer": "^10.2.6",
+    "postcss": "^8.3.0"
+  },
+  "browserslist": [
+    ">0.25%",
+    "ie >= 10",
+    "last 5 version"
+  ]
 }

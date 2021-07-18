@@ -1,6 +1,6 @@
-# IconCaptcha Plugin - Front-End Package
+# IconCaptcha - Front-End Package
 
-[![Version](https://img.shields.io/badge/Version-2.5.0-orange.svg?style=flat-square)]() [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]() [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg?style=flat-square)]()
+[![Version](https://img.shields.io/badge/Version-3.0.0-orange.svg?style=flat-square)]() [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]() [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg?style=flat-square)]()
 [![Donate](https://img.shields.io/badge/Donate-PayPal-yellow.svg?style=flat-square)](https://paypal.me/nlgamevideosnl)
 
 [![Sonar Quality](https://sonarcloud.io/api/project_badges/measure?project=fabianwennink_IconCaptcha-Plugin-Front-End&metric=alert_status)]() 
@@ -19,21 +19,17 @@ _Note: The initial version of this package starts at 2.4.0, which corresponds wi
 ___
 
 ## Building the source files
-To build the JavaScript and CSS files, you can use either Gulp or Compass (only CSS). ECMAScript 6 and later is supported.
+To build the JavaScript and CSS files, you can use either Gulp 4 or Compass (only CSS). ECMAScript 6 and later is supported.
 
 __Compass:__
 - To watch the SCSS files: ```compass watch```
 
-
 __Gulp:__
-- To watch both the JavaScript and SCSS files: ```gulp watch```
-- To watch only the SCSS files: ```gulp scss:watch```
-- To watch only the JavaScript files: ```gulp js:watch```
-- To combine the media queries in the minified CSS file: ```gulp query:css```
+- To watch the JavaScript and SCSS files: ```gulp watch```
 - To build the source code: ```gulp build```
 
 ## Credits
-The icons used in this project are made by <a href="https://www.webalys.com" target="_blank" rel="nofollow">Webalys</a>.
+The icons used in this project are made by <a href="https://streamlinehq.com" target="_blank" rel="nofollow">Streamline</a>.
 
 ## License
 This project is licensed under the <a href="https://github.com/fabianwennink/jQuery-Icon-Captcha-Plugin/blob/master/LICENSE">MIT</a> license.

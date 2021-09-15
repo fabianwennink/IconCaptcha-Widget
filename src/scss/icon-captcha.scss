@@ -5,9 +5,58 @@
  * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
  */
 
+// General
 $captcha-body-padding: 2px 4px;
 $captcha-logo-color: #52B3D9;
-$captcha-logo-color-lighter: #41a2c7;
+$captcha-logo-color-lighter: #41A2C7;
+
+// Light
+$light-theme-background-color: #FAFAFA;
+$light-theme-border-color: #F1F1F1;
+$light-theme-success-color: #5BD25B;
+$light-theme-error-color: #EF5858;
+$light-theme-info-color: #AFAFAF;
+$light-theme-header-text-color: #1D1D1D;
+$light-theme-body-subtitle-color: #9E9E9E;
+$light-theme-footer-color: #A7A7A7;
+$light-theme-footer-link-color: #448AFF;
+$light-theme-footer-link-hover-color: #74A8FF;
+$light-theme-init-background-hover-color: #F1F1F1;
+$light-theme-init-body-title-color: #464646;
+$light-theme-checkmark-svg: '../images/checkmark-light.svg';
+
+// Dark
+$dark-theme-border-color: #404040;
+$dark-theme-background-color: #4C4C4C;
+$dark-theme-success-color: #93D293;
+$dark-theme-error-color: #EF5858;
+$dark-theme-info-color: #B1B1B1;
+$dark-theme-header-text-color: #DADADA;
+$dark-theme-body-subtitle-color: #B1B1B1;
+$dark-theme-footer-color: #A7A7A7;
+$dark-theme-footer-link-color: #FFFFFF;
+$dark-theme-footer-link-hover-color: #F0F0F0;
+$dark-theme-init-background-hover-color: #454545;
+$dark-theme-init-body-title-color: #DADADA;
+$dark-theme-checkmark-svg: '../images/checkmark-dark.svg';
+
+// Legacy light
+$legacy-light-theme-background-color: #FFFFFF;
+$legacy-light-theme-border-color: #D8D8D8;
+$legacy-light-theme-header-text-color: #B1B1B1;
+$legacy-light-theme-body-subtitle-color: #B1B1B1;
+$legacy-light-theme-footer-color: #A7A7A7;
+$legacy-light-theme-footer-link-color: #448AFF;
+$legacy-light-theme-footer-link-hover-color: #74A8FF;
+
+// Legacy dark
+$legacy-dark-theme-background-color: #4C4C4C;
+$legacy-dark-theme-border-color: #404040;
+$legacy-dark-theme-header-text-color: #DADADA;
+$legacy-dark-theme-body-subtitle-color: #B1B1B1;
+$legacy-dark-theme-footer-color: #A7A7A7;
+$legacy-dark-theme-footer-link-color: #FFFFFF;
+$legacy-dark-theme-footer-link-hover-color: #F0F0F0;
 
 .iconcaptcha-holder {
     position: relative;
@@ -16,7 +65,7 @@ $captcha-logo-color-lighter: #41a2c7;
     width: 99%;
     height: auto;
     border-radius: 8px;
-    font-family: 'Poppins', 'Open Sans', sans-serif;
+    font-family: inherit;
     text-shadow: none;
     line-height: 1;
     text-rendering: optimizeLegibility;
@@ -26,16 +75,17 @@ $captcha-logo-color-lighter: #41a2c7;
         text-decoration: none;
     }
 
+    // Initial state of the captcha.
     &.iconcaptcha-init {
         transition: background 150ms linear;
 
         &:hover {
+            transition: background 150ms linear;
+
             .iconcaptcha-modal__body-circle {
                 opacity: 0.75;
                 transition: opacity .1s linear;
             }
-
-            transition: background 150ms linear;
         }
 
         .iconcaptcha-modal__body {
@@ -56,32 +106,26 @@ $captcha-logo-color-lighter: #41a2c7;
                     animation-duration: 2s;
                 }
             }
-
-            &-info {
-                position: absolute;
-                right: 6px;
-                bottom: 4px;
-                font-size: 9px;
-
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-
-            &-title {
-                font-size: 15px;
-                font-weight: bold;
-                top: 19px;
-                padding-left: 60px;
-                text-align: left;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                padding-right: 20px;
-            }
         }
     }
 
+    // Title when in initial of succeeded state.
+    &.iconcaptcha-init,
+    &.iconcaptcha-success {
+        .iconcaptcha-modal__body-title {
+            font-size: 15px;
+            font-weight: bold;
+            top: 19px;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 20px;
+            padding-left: 60px;
+        }
+    }
+
+    // General captcha state.
     .iconcaptcha-modal {
         width: 100%;
         display: block;
@@ -98,7 +142,6 @@ $captcha-logo-color-lighter: #41a2c7;
                 font-size: 11px;
                 line-height: 14px;
                 font-weight: bold;
-                color: #212121;
                 cursor: default;
 
                 &::selection {
@@ -177,6 +220,17 @@ $captcha-logo-color-lighter: #41a2c7;
                 }
             }
 
+            &-info {
+                position: absolute;
+                right: 6px;
+                bottom: 4px;
+                font-size: 9px;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
             &-icons,
             &-selection {
                 width: 100%;
@@ -215,6 +269,14 @@ $captcha-logo-color-lighter: #41a2c7;
                     content: none;
                 }
             }
+
+            &-checkmark {
+                width: 28px;
+                height: 28px;
+                position: absolute;
+                top: 13px;
+                left: 15px;
+            }
         }
 
         &__footer {
@@ -249,7 +311,242 @@ $captcha-logo-color-lighter: #41a2c7;
         }
     }
 
+    // All themes.
     &.iconcaptcha-theme {
+
+        &-light {
+            background: $light-theme-background-color;
+            border: 1px solid $light-theme-border-color;
+
+            .iconcaptcha-modal {
+                &__header {
+                    border-bottom: 2px solid $light-theme-border-color;
+                }
+
+                &__body {
+                    &-subtitle {
+                        color: $light-theme-body-subtitle-color;
+                    }
+                }
+
+                &__footer {
+                    color: $light-theme-footer-color;
+                    border-top: 2px solid $light-theme-border-color;
+                    padding-top: 6px;
+                    padding-bottom: 5px;
+
+                    & > span a {
+                        color: $light-theme-footer-link-color;
+                        text-transform: uppercase;
+                        font-weight: bold;
+
+                        &:hover {
+                            color: $light-theme-footer-link-hover-color;
+                        }
+                    }
+                }
+            }
+        }
+
+        &-legacy-light {
+            background: $legacy-light-theme-background-color;
+            border: 1px solid $legacy-light-theme-border-color;
+
+            .iconcaptcha-modal {
+                &__header {
+                    border-color: $legacy-light-theme-header-text-color;
+                }
+
+                &__body {
+                    &-subtitle {
+                        color: $legacy-light-theme-body-subtitle-color;
+                    }
+                }
+
+                &__footer {
+                    color: $legacy-light-theme-footer-color;
+                    border-top: 1px solid $legacy-light-theme-border-color;
+
+                    & > span a {
+                        color: $legacy-light-theme-footer-link-color;
+
+                        &:hover {
+                            color: $legacy-light-theme-footer-link-hover-color;
+                        }
+                    }
+                }
+            }
+        }
+
+        &-dark {
+            background: $dark-theme-background-color;
+            border: 1px solid $dark-theme-border-color;
+
+            .iconcaptcha-modal {
+                &__header {
+                    border-bottom: 2px solid $dark-theme-border-color;
+
+                    span {
+                        color: $dark-theme-header-text-color;
+                    }
+                }
+
+                &__body {
+                    &-subtitle {
+                        color: $dark-theme-body-subtitle-color;
+                    }
+                }
+
+                &__footer {
+                    color: $dark-theme-footer-color;
+                    border-top: 2px solid $dark-theme-border-color;
+                    padding-top: 6px;
+                    padding-bottom: 5px;
+
+                    & > span a {
+                        color: $dark-theme-footer-link-color;
+                        text-transform: uppercase;
+                        font-weight: bold;
+
+                        &:hover {
+                            color: $dark-theme-footer-link-hover-color;
+                        }
+                    }
+                }
+            }
+        }
+
+        &-legacy-dark {
+            background: $legacy-dark-theme-background-color;
+            border: 1px solid $legacy-dark-theme-border-color;
+
+            .iconcaptcha-modal {
+                &__header {
+                    border-color: $legacy-dark-theme-border-color;
+
+                    span {
+                        color: $legacy-dark-theme-header-text-color;
+                    }
+                }
+
+                &__body {
+                    &-subtitle {
+                        color: $legacy-dark-theme-body-subtitle-color;
+                    }
+                }
+
+                &__footer {
+                    color: $legacy-dark-theme-footer-color;
+                    border-top: 1px solid $legacy-dark-theme-border-color;
+
+                    & > span a {
+                        color: $legacy-dark-theme-footer-link-color;
+
+                        &:hover {
+                            color: $legacy-dark-theme-footer-link-hover-color;
+                        }
+                    }
+                }
+            }
+        }
+
+        &-light,
+        &-legacy-light {
+
+            &.iconcaptcha-init {
+                &:hover {
+                    background: $light-theme-init-background-hover-color;
+                }
+
+                .iconcaptcha-modal__body {
+                    &-title {
+                        color: $light-theme-init-body-title-color;
+                    }
+                }
+            }
+
+            .iconcaptcha-modal {
+                &__header {
+                    span {
+                        color: $light-theme-header-text-color;
+                    }
+                }
+
+                &__body {
+                    &-info a {
+                        color: $light-theme-info-color;
+                    }
+                }
+            }
+
+            &.iconcaptcha-success {
+
+                .iconcaptcha-modal__body {
+                    &-checkmark {
+                        background-image: url($light-theme-checkmark-svg);
+                    }
+
+                    &-title {
+                        color: $light-theme-success-color;
+                    }
+                }
+            }
+
+            &.iconcaptcha-error {
+                .iconcaptcha-modal__body-title {
+                    color: $light-theme-error-color;
+                }
+            }
+        }
+
+        &-dark,
+        &-legacy-dark {
+
+            &.iconcaptcha-init {
+                &:hover {
+                    background: $dark-theme-init-background-hover-color;
+                }
+
+                .iconcaptcha-modal__body {
+                    &-title {
+                        color: $dark-theme-init-body-title-color;
+                    }
+                }
+            }
+
+            .iconcaptcha-modal {
+                &__header {
+                    span {
+                        color: $dark-theme-header-text-color;
+                    }
+                }
+
+                &__body {
+                    &-info a {
+                        color: $dark-theme-info-color;
+                    }
+                }
+            }
+
+            &.iconcaptcha-success {
+
+                .iconcaptcha-modal__body {
+                    &-checkmark {
+                        background-image: url($dark-theme-checkmark-svg);
+                    }
+
+                    &-title {
+                        color: $dark-theme-success-color;
+                    }
+                }
+            }
+
+            &.iconcaptcha-error {
+                .iconcaptcha-modal__body-title {
+                    color: $dark-theme-error-color;
+                }
+            }
+        }
 
         &-legacy-light,
         &-legacy-dark {
@@ -263,7 +560,8 @@ $captcha-logo-color-lighter: #41a2c7;
 
             .iconcaptcha-modal {
                 &__header {
-                    border-bottom: 1px solid;
+                    border-bottom-width: 1px;
+                    border-bottom-style: solid;
 
                     span {
                         font-weight: 500;
@@ -283,216 +581,9 @@ $captcha-logo-color-lighter: #41a2c7;
                 }
             }
         }
-
-        &-light {
-            $light-theme-border-color: #f1f1f1;
-            $light-theme-background-color: #fafafa;
-            background: #fafafa;
-            border: 1px solid $light-theme-border-color;
-
-            .iconcaptcha-modal {
-                &__header {
-                    border-bottom: 2px solid $light-theme-border-color;
-                }
-
-                &__body {
-                    &-subtitle {
-                        color: #9e9e9e;
-                    }
-                }
-
-                &__footer {
-                    color: #a7a7a7;
-                    border-top: 2px solid $light-theme-border-color;
-                    padding-top: 6px;
-                    padding-bottom: 5px;
-
-                    & > span a {
-                        color: #448AFF;
-                        text-transform: uppercase;
-                        font-weight: bold;
-
-                        &:hover {
-                            color: #74a8ff;
-                        }
-                    }
-                }
-            }
-        }
-
-        &-dark {
-            $dark-theme-border-color: #404040;
-            $dark-theme-background-color: #4c4c4c;
-            background: $dark-theme-background-color;
-            border: 1px solid $dark-theme-border-color;
-
-            .iconcaptcha-modal {
-                &__header {
-                    border-bottom: 2px solid $dark-theme-border-color;
-
-                    span {
-                        color: #dadada;
-                    }
-                }
-
-                &__body {
-                    &-subtitle {
-                        color: #b1b1b1;
-                    }
-                }
-
-                &__footer {
-                    color: #a7a7a7;
-                    border-top: 2px solid $dark-theme-border-color;
-                    padding-top: 6px;
-                    padding-bottom: 5px;
-
-                    & > span a {
-                        color: #ffffff;
-                        text-transform: uppercase;
-                        font-weight: bold;
-
-                        &:hover {
-                            color: #f0f0f0;
-                        }
-                    }
-                }
-            }
-        }
-
-        &-legacy-light {
-            background: #ffffff;
-            border: 1px solid #d8d8d8;
-
-            .iconcaptcha-modal {
-                &__header {
-                    border-color: #d8d8d8;
-
-                    span {
-                        color: #1d1d1d;
-                    }
-                }
-
-                &__body {
-                    &-subtitle {
-                        color: #b1b1b1;
-                    }
-                }
-
-                &__footer {
-                    color: #a7a7a7;
-                    border-top: 1px solid #eaeaea;
-
-                    & > span a {
-                        color: #448AFF;
-
-                        &:hover {
-                            color: #74a8ff;
-                        }
-                    }
-                }
-            }
-        }
-
-        &-legacy-dark {
-            background: #4c4c4c;
-            border: 1px solid #404040;
-
-            .iconcaptcha-modal {
-                &__header {
-                    border-color: #404040;
-
-                    span {
-                        color: #fff;
-                    }
-                }
-
-                &__body {
-                    &-subtitle {
-                        color: #b1b1b1;
-                    }
-                }
-
-                &__footer {
-                    color: #a7a7a7;
-                    border-top: 1px solid #404040;
-
-                    & > span a {
-                        color: #fff;
-
-                        &:hover {
-                            color: #f0f0f0;
-                        }
-                    }
-                }
-            }
-        }
-
-        &-light,
-        &-legacy-light {
-
-            &.iconcaptcha-init {
-                &:hover {
-                    background: #f1f1f1;
-                }
-
-                .iconcaptcha-modal__body {
-                    &-info a {
-                        color: #afafaf;
-                    }
-
-                    &-title {
-                        color: #464646;
-                    }
-                }
-            }
-
-            &.iconcaptcha-success {
-                .iconcaptcha-modal__body-title {
-                    color: #5bd25b;
-                }
-            }
-
-            &.iconcaptcha-error {
-                .iconcaptcha-modal__body-title {
-                    color: #ef5858;
-                }
-            }
-        }
-
-        &-dark,
-        &-legacy-dark {
-
-            &.iconcaptcha-init {
-                &:hover {
-                    background: #454545;
-                }
-
-                .iconcaptcha-modal__body {
-                    &-info a {
-                        color: #b1b1b1;
-                    }
-
-                    &-title {
-                        color: #dadada;
-                    }
-                }
-            }
-
-            &.iconcaptcha-success {
-                .iconcaptcha-modal__body-title {
-                    color: #93d293;
-                }
-            }
-
-            &.iconcaptcha-error {
-                .iconcaptcha-modal__body-title {
-                    color: #ef5858;
-                }
-            }
-        }
     }
 
+    // Change the cursor back to default when an image was selected.
     &.iconcaptcha-success,
     &.iconcaptcha-error {
         cursor: default;
@@ -513,6 +604,7 @@ $captcha-logo-color-lighter: #41a2c7;
     }
 }
 
+// IconCaptcha logo animation when in 'init' state.
 @keyframes captcha-breathing {
     0%, 100% {
         transform: scale(1) translateZ(0);

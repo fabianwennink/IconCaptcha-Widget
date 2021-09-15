@@ -13,9 +13,6 @@ IconCaptcha is a faster and more user-friendly captcha than most other captchas.
 text-images, with IconCaptcha you only have to compare two images and select the image which is only present once.
 
 This repository contains the front-end source of the IconCaptcha plugins for PHP and ASP.NET. For the installation guide of this package, follow the installation guide of the respective back-end package you want to use.
-
-_Note: The initial version of this package starts at 2.4.0, which corresponds with the current version of the PHP back-end package. This choice was made due to the fact that the front-end files where initially part of the PHP back-end package._
-
 ___
 
 ## Building the source files

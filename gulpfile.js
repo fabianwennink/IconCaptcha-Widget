@@ -6,17 +6,19 @@
  */
 
 const gulp = require('gulp');
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const postcss = require('gulp-postcss');
 const rename = require('gulp-rename');
 const babelJS = require("gulp-babel");
 const minify = require("gulp-babel-minify");
 const autoprefixer = require('autoprefixer');
+const concat = require('gulp-concat');
 
 const CSS_INPUT = 'src/scss/*.scss';
-const CSS_OUTPUT = 'dist/css';
-const JS_INPUT = 'src/js/*.js';
-const JS_OUTPUT = 'dist/js';
+const CSS_OUTPUT = 'assets/css';
+const JS_INPUT = ['src/js/polyfill.js', 'src/js/*.js'];
+const JS_OUTPUT = 'assets/js';
+const FILE_OUTPUT_NAME = 'icon-captcha';
 
 /*************************************************/
 
@@ -33,6 +35,7 @@ const js = () => {
         .pipe(babelJS({
             presets: ['@babel/preset-env']
         }))
+        .pipe(concat(`${FILE_OUTPUT_NAME}.js`))
         .pipe(minify({
             mangle: true
         }))
@@ -45,12 +48,9 @@ const watch = () => {
     gulp.watch(JS_INPUT, gulp.parallel(js));
 }
 
-
-
 /*************************************************/
 
 exports.js = js;
 exports.css = css;
-exports.watch = gulp.series(css, js, watch)
-exports.build = gulp.series(css, js);
+exports.watch = gulp.series(css, js, watch);
 exports.default = gulp.parallel(css, js);

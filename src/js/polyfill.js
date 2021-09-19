@@ -1,5 +1,5 @@
 /**
- * Icon Captcha Plugin: v3.0.0
+ * IconCaptcha Plugin: v3.0.0
  * Copyright © 2021, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
@@ -65,12 +65,18 @@ const IconCaptchaPolyfills = (function () {
             request.onerror = (err) => options.error(err);
         }
 
+        if(options.headers) {
+            for (const key in options.headers) {
+                request.setRequestHeader(key, options.headers[key]);
+            }
+        }
+
+        if (!options.crossDomain) {
+            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        }
+
         // Make sure there is a body to encode.
         if (options.data) {
-
-            if (!options.crossDomain) {
-                request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            }
 
             options.processData = options.processData || true;
 

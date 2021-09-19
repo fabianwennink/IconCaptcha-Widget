@@ -1,5 +1,5 @@
 /**
- * Icon Captcha Plugin: v3.0.0
+ * IconCaptcha Plugin: v3.0.0
  * Copyright © 2021, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
@@ -150,6 +150,7 @@ const IconCaptcha = (function () {
         const _captchaHolder = element;
         let _captchaIconHolder;
         let _captchaSelectionCursor;
+        let _captchaToken;
 
         let startedInitialization = false;
         let invalidateTimeoutId = null;
@@ -163,16 +164,21 @@ const IconCaptcha = (function () {
 
         // Make sure the validationPath option is set.
         if (!options.general.validationPath) {
-            setCaptchaError(true,
-                'The IconCaptcha was configured incorrectly.',
-                'The option `validationPath` has not been set.');
+            setCaptchaError(true, 'The IconCaptcha was configured incorrectly.',
+                'The option `validationPath` has not been set. Make sure IconCaptcha is installed/configured properly.');
             return;
         }
 
         // Initialize the captcha
         init();
 
+        /**
+         * Initializes the plugin.
+         */
         function init() {
+
+            // Get the CSRF token, if available.
+            _captchaToken = document.querySelector('input[name="_iconcaptcha-token"]')?.value;
 
             // Apply the captcha theme, if set, else default to 'light'.
             let captchaTheme = _captchaHolder.getAttribute('data-theme') || 'light';
@@ -206,18 +212,24 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Requests the captcha data from the server via an AJAX call. Based on the result of the
+         * request, the captcha will either be initialized or an error message will be shown.
+         * @param captchaTheme The theme name which is used by the captcha instance.
+         */
         function loadCaptcha(captchaTheme) {
 
             // Create the base64 payload.
             const requestPayload = createPayload({
-                i: _captchaId, a: 1, t: captchaTheme
+                i: _captchaId, a: 1, t: captchaTheme, tk: _captchaToken
             });
 
             // Load the captcha data.
             IconCaptchaPolyfills.ajax({
                 url: options.general.validationPath,
                 type: 'post',
-                data: {requestPayload},
+                headers: createHeaders(_captchaToken),
+                data: {payload: requestPayload},
                 success: function (data) {
                     if (data && typeof data === 'string') {
 
@@ -231,11 +243,11 @@ const IconCaptcha = (function () {
                         }
 
                         // Create the base64 payload.
-                        const payload = createPayload({i: _captchaId});
+                        const imageRequestPayload = createPayload({i: _captchaId, tk: _captchaToken});
 
                         // Load the captcha image.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
-                        iconsHolder.style.backgroundImage = `url(${options.general.validationPath}?payload=${payload})`;
+                        iconsHolder.style.backgroundImage = `url(${options.general.validationPath}?payload=${imageRequestPayload})`;
                         removeLoadingSpinnerOnImageLoad(iconsHolder);
 
                         // Add the selection area to the captcha holder.
@@ -275,6 +287,10 @@ const IconCaptcha = (function () {
             });
         }
 
+        /**
+         * Builds the HTML for the initial state of the captcha. The HTML will
+         * replace the current content of the captcha holder element.
+         */
         function buildCaptchaInitialHolder() {
             const captchaHTML = [
                 "<div class='iconcaptcha-modal'>",
@@ -293,6 +309,10 @@ const IconCaptcha = (function () {
             _captchaHolder.innerHTML = captchaHTML.join('');
         }
 
+        /**
+         * Builds the HTML for the challenge state of the captcha. The HTML will
+         * replace the current content of the captcha holder element.
+         */
         function buildCaptchaHolder() {
             let captchaHTML = [];
 
@@ -333,6 +353,10 @@ const IconCaptcha = (function () {
             _captchaIconHolder = _captchaHolder.querySelector('.iconcaptcha-modal__body');
         }
 
+        /**
+         * Resets the state of the captcha holder element. The error state will be removed,
+         * some hidden input fields will be cleared and the captcha will be reinitialized.
+         */
         function resetCaptchaHolder() {
             _captchaHolder.classList.remove('iconcaptcha-error');
             _captchaHolder.querySelector("input[name='ic-hf-se']").setAttribute('value', null);
@@ -348,6 +372,14 @@ const IconCaptcha = (function () {
             IconCaptchaPolyfills.trigger(_captchaHolder, 'refreshed', {captchaId: _captchaId});
         }
 
+        /**
+         * Submits the icon selection made by the user to the server for validation. Before submitting, the
+         * invalidation timer will be cancelled and some information will be written to the hidden input fields.
+         * In case the correct icon was selected, the success state will be shown. If an incorrect icon
+         * was selected, the error state will be shown instead.
+         * @param xPos The clicked X position.
+         * @param yPos The clicked Y position.
+         */
         function submitIconSelection(xPos, yPos) {
             if (xPos !== undefined && yPos !== undefined) {
 
@@ -368,20 +400,26 @@ const IconCaptcha = (function () {
                 _captchaSelectionCursor.style.display = 'none';
 
                 // Create the base64 payload.
-                const payload = createPayload({
-                    i: _captchaId, x: xPos, y: yPos, w: captchaImageWidth, a: 2
+                const requestPayload = createPayload({
+                    i: _captchaId, x: xPos, y: yPos, w: captchaImageWidth, a: 2, tk: _captchaToken
                 });
 
+                // Perform the request.
                 IconCaptchaPolyfills.ajax({
                     url: options.general.validationPath,
                     type: 'POST',
-                    data: {payload},
+                    headers: createHeaders(_captchaToken),
+                    data: {payload: requestPayload},
                     success: () => showCompletionMessage(),
                     error: () => showIncorrectIconMessage()
                 });
             }
         }
 
+        /**
+         * Changes the captcha state to the 'success' state. The header, parts of the
+         * body and the footer will be replaced with the new success message state.
+         */
         function showCompletionMessage() {
             _captchaIconHolder.classList.remove('captcha-opacity');
 
@@ -391,8 +429,8 @@ const IconCaptcha = (function () {
 
             // Clear the modal, except for the input fields.
             const elements = _captchaHolder.querySelectorAll('.iconcaptcha-modal__header, .iconcaptcha-modal__footer, .iconcaptcha-modal__body');
-            _forEach(elements, function(el) {
-                element.parentNode.removeChild(el);
+            _forEach(elements, function (el) {
+                el.parentNode.removeChild(el);
             });
 
             // Add the success message to the element.
@@ -416,6 +454,12 @@ const IconCaptcha = (function () {
             IconCaptchaPolyfills.trigger(_captchaHolder, 'success', {captchaId: _captchaId});
         }
 
+        /**
+         * Changes the captcha state to the 'error' state.
+         * @param topMessage The title message of the error state.
+         * @param bottomMessage The subtitle message of the error state.
+         * @param reset TRUE If the captcha should reinitialize automatically after some time, FALSE if not.
+         */
         function showIncorrectIconMessage(topMessage, bottomMessage, reset = true) {
             _captchaIconHolder.classList.remove('captcha-opacity');
 
@@ -444,11 +488,17 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Adds the loading spinner icon to the captcha holder element.
+         */
         function addLoadingSpinner() {
             _captchaIconHolder.classList.add('captcha-opacity');
             _captchaIconHolder.insertAdjacentHTML('beforeend', '<div class="captcha-loader"></div>')
         }
 
+        /**
+         * Removes the loading spinner icon from the captcha holder element.
+         */
         function removeLoadingSpinner() {
             _captchaIconHolder.classList.remove('captcha-opacity');
 
@@ -456,6 +506,11 @@ const IconCaptcha = (function () {
             captchaLoader?.parentNode?.removeChild(captchaLoader);
         }
 
+        /**
+         * Removes the loading spinner icon from the captcha holder element when
+         * the background image of the given DOM element is fully loaded.
+         * @param elem The DOM element.
+         */
         function removeLoadingSpinnerOnImageLoad(elem) {
             const imageUrl = elem.style.backgroundImage.match(/\((.*?)\)/)[1].replace(/(['"])/g, '');
             const imgObject = new Image();
@@ -470,6 +525,12 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Invalidates the current captcha session and resets requests the captcha holder element to be reset.
+         * An AJAX call will be performed to invalidate the session on the server-side, after which the client-side
+         * state will be invalidated and reset.
+         * @param invalidateServer TRUE if the server-side should be invalidated or not, FALSE if not.
+         */
         function invalidateSession(invalidateServer = true) {
 
             // Reset the captcha state.
@@ -478,12 +539,13 @@ const IconCaptcha = (function () {
 
             // Create the base64 payload.
             if (invalidateServer) {
-                const payload = createPayload({i: _captchaId, a: 3});
+                const payload = createPayload({i: _captchaId, a: 3, tk: _captchaToken});
                 IconCaptchaPolyfills.ajax({
                     url: options.general.validationPath,
                     type: 'post',
+                    headers: createHeaders(_captchaToken),
                     data: {payload},
-                    success: function() {
+                    success: function () {
                         IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _captchaId});
                         buildCaptchaInitialHolder();
                     },
@@ -494,6 +556,9 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Clears the invalidation timer.
+         */
         function clearInvalidationTimeout() {
             if (invalidateTimeoutId !== null) {
                 clearTimeout(invalidateTimeoutId);
@@ -501,26 +566,54 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Processes the error data which was received from the server while requesting the captcha data. Actions
+         * might be performed based on the given error code or error data.
+         * @param code The error code.
+         * @param data The payload of the error.
+         */
         function processCaptchaRequestError(code, data) {
             code = parseInt(code);
 
-            // Too many incorrect selections, timeout.
-            if (code === 1) {
-                showIncorrectIconMessage(options.messages.timeout.title, options.messages.timeout.subtitle, false);
+            switch (code) {
+                case 1: // Too many incorrect selections, timeout.
+                    showIncorrectIconMessage(options.messages.timeout.title, options.messages.timeout.subtitle, false);
 
-                // Remove the header from the captcha.
-                const captchaHeader = _captchaHolder.querySelector('.iconcaptcha-modal__header');
-                captchaHeader.parentNode.removeChild(captchaHeader);
+                    // Remove the header from the captcha.
+                    const captchaHeader = _captchaHolder.querySelector('.iconcaptcha-modal__header');
+                    captchaHeader.parentNode.removeChild(captchaHeader);
 
-                // Reset the captcha to the init holder.
-                setTimeout(() => invalidateSession(false), data);
+                    // Trigger: timeout
+                    IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _captchaId});
+
+                    // Reset the captcha to the init holder.
+                    setTimeout(() => invalidateSession(false), data);
+                    break;
+                case 2: // No CSRF token found while validating.
+                    setCaptchaError(true,
+                        'The captcha token is missing or is incorrect.',
+                        'A request was made to the server without including a captcha session token, however the use of this token option is enabled. ' +
+                        'Please refer to the IconCaptcha Wiki on how to properly set up IconCaptcha with CSRF token support enabled.');
+                    break;
+                default: // Any other error.
+                    setCaptchaError(true,
+                        'An unexpected error occurred.',
+                        'An unexpected error occurred while IconCaptcha performed an action. Make sure IconCaptcha is installed/configured properly.');
+                    break;
             }
         }
 
+        /**
+         * Use to log a serious error which prevents the plugin from initializing.
+         * @param triggerEvent TRUE if the custom 'error' event should be triggered.
+         * @param displayError The error message to display in the captcha holder element.
+         * @param consoleError The error message to display in the developer console. When left empty, the
+         * displayError will be written to the developer console instead.
+         */
         function setCaptchaError(triggerEvent, displayError, consoleError = '') {
 
             // Display and log the error.
-            _captchaHolder.innerHTML = 'IconCaptcha Error: ' + displayError;
+            showIncorrectIconMessage('IconCaptcha Error', displayError, false);
             console.error('IconCaptcha Error: ' + (consoleError !== '') ? consoleError : displayError);
 
             // Trigger: error
@@ -529,10 +622,33 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Creates a Base64 encoded JSON string from the given data parameter.
+         * @param data The payload object to encode.
+         * @returns {string} The encoded payload.
+         */
         function createPayload(data) {
             return btoa(JSON.stringify(data));
         }
 
+        /**
+         * Creates the custom header object which should be included in every AJAX request.
+         * @param token The captcha session token, possibly empty.
+         * @returns {{}} The header object.
+         */
+        function createHeaders(token) {
+            let headers = {};
+            if (token) {
+                headers = {
+                    'X-IconCaptcha-Token': token
+                };
+            }
+            return headers;
+        }
+
+        /**
+         * Registers any event which is linked to the captcha holder element.
+         */
         function registerHolderEvents() {
             if (options.security.enableInitialMessage) {
                 _captchaHolder.addEventListener('click', function (e) {
@@ -556,6 +672,9 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Registers any event which is linked to the captcha selection area element.
+         */
         function registerSelectionEvents(captchaSelection) {
 
             const mouseClickEvent = function (e) {
@@ -620,6 +739,9 @@ const IconCaptcha = (function () {
             }
         }
 
+        /**
+         * Unregisters any event which is linked to the captcha selection area element.
+         */
         function unregisterSelectionEvents(captchaSelection) {
 
             // Make sure the listeners cache exists on the element.
@@ -632,16 +754,20 @@ const IconCaptcha = (function () {
             }
         }
 
-        function moveCustomCursor(e) {
-            if (e.currentTarget == null)
+        /**
+         * Moves the custom cursor to the current location of the actual cursor.
+         * @param event The mouse move event.
+         */
+        function moveCustomCursor(event) {
+            if (event.currentTarget == null)
                 return;
 
             // Calculate the clicked X and Y position.
-            let offset = IconCaptchaPolyfills.offset(e.currentTarget);
+            let offset = IconCaptchaPolyfills.offset(event.currentTarget);
 
             // Apply the style position to the cursor.
-            _captchaSelectionCursor.style.left = (Math.round(e.pageX - offset.left) - 8) + 'px';
-            _captchaSelectionCursor.style.top = (Math.round(e.pageY - offset.top) - 7) + 'px';
+            _captchaSelectionCursor.style.left = (Math.round(event.pageX - offset.left) - 8) + 'px';
+            _captchaSelectionCursor.style.top = (Math.round(event.pageY - offset.top) - 7) + 'px';
         }
     }
 
@@ -656,8 +782,8 @@ if (window.jQuery != null) {
 
                 // Extract the DOM elements from the jQuery object.
                 let nodes = [];
-                for (let i = 0; i < this.length; i++) {
-                    nodes.push(this[i]);
+                for (let element of this) {
+                    nodes.push(element);
                 }
 
                 // Initialize IconCaptcha.

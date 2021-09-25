@@ -2,7 +2,7 @@
  * IconCaptcha Plugin: v3.0.0
  * Copyright © 2021, Fabian Wennink (https://www.fabianwennink.nl)
  *
- * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license
  */
 
 const IconCaptcha = (function () {
@@ -164,8 +164,7 @@ const IconCaptcha = (function () {
 
         // Make sure the validationPath option is set.
         if (!options.general.validationPath) {
-            setCaptchaError(true, 'The IconCaptcha was configured incorrectly.',
-                'The option `validationPath` has not been set. Make sure IconCaptcha is installed/configured properly.');
+            setCaptchaError(true, 'IconCaptcha was configured incorrectly', 'The IconCaptcha option `validationPath` has not been set.');
             return;
         }
 
@@ -592,13 +591,10 @@ const IconCaptcha = (function () {
                 case 2: // No CSRF token found while validating.
                     setCaptchaError(true,
                         'The captcha token is missing or is incorrect.',
-                        'A request was made to the server without including a captcha session token, however the use of this token option is enabled. ' +
-                        'Please refer to the IconCaptcha Wiki on how to properly set up IconCaptcha with CSRF token support enabled.');
+                        'A server request was made without including a captcha token, however this option is enabled.');
                     break;
                 default: // Any other error.
-                    setCaptchaError(true,
-                        'An unexpected error occurred.',
-                        'An unexpected error occurred while IconCaptcha performed an action. Make sure IconCaptcha is installed/configured properly.');
+                    setCaptchaError(true, 'An unexpected error occurred.', 'An unexpected error occurred while IconCaptcha performed an action.');
                     break;
             }
         }
@@ -782,9 +778,9 @@ if (window.jQuery != null) {
 
                 // Extract the DOM elements from the jQuery object.
                 let nodes = [];
-                for (let element of this) {
+                $.each(this, (_, element) => {
                     nodes.push(element);
-                }
+                });
 
                 // Initialize IconCaptcha.
                 return IconCaptcha.$init(nodes, options);

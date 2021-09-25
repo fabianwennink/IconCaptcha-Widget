@@ -2,7 +2,7 @@
  * IconCaptcha Plugin: v3.0.0
  * Copyright © 2021, Fabian Wennink (https://www.fabianwennink.nl)
  *
- * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license
  */
 
 const IconCaptchaPolyfills = (function () {
@@ -54,7 +54,7 @@ const IconCaptchaPolyfills = (function () {
                     }
                 } else {
                     if (options.error) {
-                        options.error({message: `HTTP request returned with HTTP status code ${request.status}.`});
+                        options.error({message: `Request returned ${request.status}.`});
                     }
                 }
             };
@@ -71,9 +71,7 @@ const IconCaptchaPolyfills = (function () {
             }
         }
 
-        if (!options.crossDomain) {
-            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        }
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         // Make sure there is a body to encode.
         if (options.data) {
@@ -81,7 +79,7 @@ const IconCaptchaPolyfills = (function () {
             options.processData = options.processData || true;
 
             // Check if JSON string or FormData.
-            if (options.data instanceof FormData || options.processData) {
+            if (options.data instanceof  FormData|| options.processData) {
                 options.data = options.data || {};
 
                 // Turn the object into form data.

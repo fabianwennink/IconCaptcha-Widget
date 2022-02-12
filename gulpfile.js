@@ -1,6 +1,6 @@
 /**
- * Icon Captcha Plugin: v3.0.0
- * Copyright © 2021, Fabian Wennink (https://www.fabianwennink.nl)
+ * Icon Captcha Plugin: v3.0.1
+ * Copyright © 2022, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license
  */
@@ -16,12 +16,12 @@ const header = require('gulp-header');
 const uglify = require('gulp-uglify');
 
 const CSS_INPUT = 'src/scss/*.scss';
-const CSS_OUTPUT = 'assets/css';
+const CSS_OUTPUT = 'dist/css';
 const JS_INPUT = ['src/js/polyfill.js', 'src/js/*.js'];
-const JS_OUTPUT = 'assets/js';
+const JS_OUTPUT = 'dist/js';
 const FILE_OUTPUT_NAME = 'icon-captcha';
 
-const HEADER = '/*! IconCaptcha v3.0.0 | (c) 2021, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha/license */\n';
+const HEADER = '/*! IconCaptcha v3.0.0 | (c) 2022, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha/license */\n';
 
 /*************************************************/
 

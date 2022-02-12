@@ -1,6 +1,6 @@
 /**
- * IconCaptcha Plugin: v3.0.0
- * Copyright © 2021, Fabian Wennink (https://www.fabianwennink.nl)
+ * IconCaptcha Plugin: v3.0.1
+ * Copyright © 2022, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license
  */
@@ -546,12 +546,12 @@ const IconCaptcha = (function () {
                     data: {payload},
                     success: function () {
                         IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _captchaId});
-                        buildCaptchaInitialHolder();
+                        resetCaptchaHolder();
                     },
                     error: () => showIncorrectIconMessage()
                 });
             } else {
-                buildCaptchaInitialHolder();
+                resetCaptchaHolder();
             }
         }
 
@@ -624,7 +624,7 @@ const IconCaptcha = (function () {
          * @returns {string} The encoded payload.
          */
         function createPayload(data) {
-            return btoa(JSON.stringify(data));
+            return btoa(JSON.stringify({ ...data, ts: Date.now() }));
         }
 
         /**

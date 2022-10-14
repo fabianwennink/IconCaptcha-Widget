@@ -241,7 +241,7 @@ const IconCaptcha = (function () {
             // Create the base64 payload.
             const requestPayload = createPayload({
                 id: _captchaId,
-                action: 1,
+                action: 'LOAD',
                 theme: captchaTheme,
                 token: _captchaToken,
             });
@@ -249,7 +249,7 @@ const IconCaptcha = (function () {
             // Load the captcha data.
             IconCaptchaPolyfills.ajax({
                 url: options.general.validationPath,
-                type: 'post',
+                type: 'POST',
                 headers: createHeaders(_captchaToken),
                 data: {payload: requestPayload},
                 success: function (data) {
@@ -267,7 +267,8 @@ const IconCaptcha = (function () {
                         // Create the base64 payload.
                         const imageRequestPayload = createPayload({
                             id: _captchaId,
-                            token: _captchaToken
+                            action: 'RENDER',
+                            token: _captchaToken,
                         });
 
                         // Load the captcha image.
@@ -427,7 +428,7 @@ const IconCaptcha = (function () {
                 // Create the base64 payload.
                 const requestPayload = createPayload({
                     id: _captchaId,
-                    action: 2,
+                    action: 'SELECTION',
                     x: xPos,
                     y: yPos,
                     width: captchaImageWidth,
@@ -567,18 +568,18 @@ const IconCaptcha = (function () {
             generated = false;
             startedInitialization = false;
 
-            // Create the base64 payload.
             if (invalidateServer) {
 
+                // Create the base64 payload.
                 const payload = createPayload({
                     id: _captchaId,
-                    action: 3,
+                    action: 'INVALIDATE',
                     token: _captchaToken,
                 });
 
                 IconCaptchaPolyfills.ajax({
                     url: options.general.validationPath,
-                    type: 'post',
+                    type: 'POST',
                     headers: createHeaders(_captchaToken),
                     data: {payload},
                     success: function () {

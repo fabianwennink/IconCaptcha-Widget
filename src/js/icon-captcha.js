@@ -240,7 +240,10 @@ const IconCaptcha = (function () {
 
             // Create the base64 payload.
             const requestPayload = createPayload({
-                i: _captchaId, a: 1, t: captchaTheme, tk: _captchaToken
+                id: _captchaId,
+                action: 1,
+                theme: captchaTheme,
+                token: _captchaToken,
             });
 
             // Load the captcha data.
@@ -262,7 +265,10 @@ const IconCaptcha = (function () {
                         }
 
                         // Create the base64 payload.
-                        const imageRequestPayload = createPayload({i: _captchaId, tk: _captchaToken});
+                        const imageRequestPayload = createPayload({
+                            id: _captchaId,
+                            token: _captchaToken
+                        });
 
                         // Load the captcha image.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
@@ -420,7 +426,12 @@ const IconCaptcha = (function () {
 
                 // Create the base64 payload.
                 const requestPayload = createPayload({
-                    i: _captchaId, x: xPos, y: yPos, w: captchaImageWidth, a: 2, tk: _captchaToken
+                    id: _captchaId,
+                    action: 2,
+                    x: xPos,
+                    y: yPos,
+                    width: captchaImageWidth,
+                    token: _captchaToken,
                 });
 
                 // Perform the request.
@@ -558,7 +569,13 @@ const IconCaptcha = (function () {
 
             // Create the base64 payload.
             if (invalidateServer) {
-                const payload = createPayload({i: _captchaId, a: 3, tk: _captchaToken});
+
+                const payload = createPayload({
+                    id: _captchaId,
+                    action: 3,
+                    token: _captchaToken,
+                });
+
                 IconCaptchaPolyfills.ajax({
                     url: options.general.validationPath,
                     type: 'post',

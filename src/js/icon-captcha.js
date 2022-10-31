@@ -264,16 +264,9 @@ const IconCaptcha = (function () {
                             return;
                         }
 
-                        // Create the base64 payload.
-                        const imageRequestPayload = createPayload({
-                            id: _captchaId,
-                            action: 'RENDER',
-                            token: _captchaToken,
-                        });
-
                         // Load the captcha image.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
-                        iconsHolder.style.backgroundImage = `url(${options.general.validationPath}?payload=${imageRequestPayload})`;
+                        iconsHolder.style.backgroundImage = `url(data:image/png;base64,${result.challenge})`;
                         removeLoadingSpinnerOnImageLoad(iconsHolder);
 
                         // Add the selection area to the captcha holder.

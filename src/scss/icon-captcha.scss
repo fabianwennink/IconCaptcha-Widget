@@ -23,7 +23,6 @@ $light-theme-footer-link-color: #448AFF;
 $light-theme-footer-link-hover-color: #74A8FF;
 $light-theme-init-background-hover-color: #F1F1F1;
 $light-theme-init-body-title-color: #464646;
-$light-theme-checkmark-svg: '../images/checkmark-light.svg';
 
 // Dark
 $dark-theme-border-color: #404040;
@@ -38,7 +37,6 @@ $dark-theme-footer-link-color: #FFFFFF;
 $dark-theme-footer-link-hover-color: #F0F0F0;
 $dark-theme-init-background-hover-color: #454545;
 $dark-theme-init-body-title-color: #DADADA;
-$dark-theme-checkmark-svg: '../images/checkmark-dark.svg';
 
 // Legacy light
 $legacy-light-theme-background-color: #FFFFFF;
@@ -276,7 +274,6 @@ $legacy-dark-theme-footer-link-hover-color: #F0F0F0;
                 position: absolute;
                 top: 13px;
                 left: 15px;
-                background-image: url("data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E%3Csvg enable-background='new 0 0 98.5 98.5' version='1.1' viewBox='0 0 98.5 98.5' xml:space='preserve' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath class='checkmark' d='M81.7,17.8C73.5,9.3,62,4,49.2,4 C24.3,4,4,24.3,4,49.2s20.3,45.2,45.2,45.2s45.2-20.3,45.2-45.2c0-8.6-2.4-16.6-6.5-23.4l0,0L45.6,68.2L24.7,47.3' fill='none' stroke-miterlimit='10' stroke-width='8' stroke='none'/%3E%3C/svg%3E ");
             }
         }
 

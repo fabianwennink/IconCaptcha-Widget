@@ -255,7 +255,7 @@ $legacy-dark-theme-footer-link-hover-color: #F0F0F0;
             }
 
             // Apply opacity on captcha
-            &.captcha-opacity > div:not(.captcha-loader) {
+            &.captcha-opacity > canvas:not(.captcha-loader) {
                 -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
                 filter: alpha(opacity=15);
                 -moz-opacity: 0.15;

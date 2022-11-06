@@ -264,10 +264,11 @@ const IconCaptcha = (function () {
                             return;
                         }
 
-                        // Load the captcha image.
+                        // Render the challenge.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
-                        iconsHolder.style.backgroundImage = `url(data:image/png;base64,${result.challenge})`;
-                        removeLoadingSpinnerOnImageLoad(iconsHolder);
+                        renderChallengeOnCanvas(iconsHolder, result.challenge, () => {
+                            removeLoadingSpinner();
+                        });
 
                         // Add the selection area to the captcha holder.
                         iconsHolder.parentNode.insertAdjacentHTML('beforeend', '<div class="iconcaptcha-modal__body-selection"><i></i></div>');
@@ -342,7 +343,7 @@ const IconCaptcha = (function () {
                 `<span>${options.messages.header}</span>`,
                 "</div>",
                 "<div class='iconcaptcha-modal__body'>",
-                "<div class='iconcaptcha-modal__body-icons'></div>",
+                "<canvas class='iconcaptcha-modal__body-icons'></canvas>",
                 "</div>",
                 `<div class='iconcaptcha-modal__footer'>`
             );
@@ -382,7 +383,7 @@ const IconCaptcha = (function () {
 
             // Reset the captcha body.
             IconCaptchaPolyfills.empty(_captchaIconHolder);
-            _captchaIconHolder.insertAdjacentHTML('beforeend', "<div class='iconcaptcha-modal__body-icons'></div>");
+            _captchaIconHolder.insertAdjacentHTML('beforeend', "<canvas class='iconcaptcha-modal__body-icons'></canvas>");
 
             // Reload the captcha.
             init();
@@ -513,6 +514,33 @@ const IconCaptcha = (function () {
         }
 
         /**
+         * Renders the challenge image onto the captcha's canvas.
+         * @param holder The captcha element in which the challenge will be rendered.
+         * @param challenge The challenge image, as a base64 string.
+         * @param callback The callback which will be fired when the challenge was rendered.
+         */
+        function renderChallengeOnCanvas(holder, challenge, callback) {
+
+            // Get the dimensions of the captcha challenge holder.
+            const style = window.getComputedStyle(holder);
+            holder.width = style.getPropertyValue('width').replace('px', '');
+            holder.height = style.getPropertyValue('height').replace('px', '')
+
+            // Render the challenge onto the canvas.
+            const image = new Image();
+            image.src = `data:image/png;base64,${challenge}`;
+            image.onload = () => {
+                holder.getContext('2d')?.drawImage(image, 0, 0);
+                callback();
+            };
+
+            // Workaround for IE (IE sometimes doesn't fire onload on cached resources).
+            if (image.complete) {
+                image.onload(this);
+            }
+        }
+
+        /**
          * Adds the loading spinner icon to the captcha holder element.
          */
         function addLoadingSpinner() {
@@ -528,25 +556,6 @@ const IconCaptcha = (function () {
 
             const captchaLoader = _captchaIconHolder.querySelector('.captcha-loader');
             captchaLoader?.parentNode?.removeChild(captchaLoader);
-        }
-
-        /**
-         * Removes the loading spinner icon from the captcha holder element when
-         * the background image of the given DOM element is fully loaded.
-         * @param elem The DOM element.
-         */
-        function removeLoadingSpinnerOnImageLoad(elem) {
-            const imageUrl = elem.style.backgroundImage.match(/\((.*?)\)/)[1].replace(/(['"])/g, '');
-            const imgObject = new Image();
-
-            // Listen to the image loading event.
-            imgObject.onload = () => removeLoadingSpinner();
-
-            // Workaround for IE (IE sometimes doesn't fire onload on cached resources).
-            imgObject.src = imageUrl;
-            if (imgObject.complete) {
-                imgObject.onload(this);
-            }
         }
 
         /**

@@ -264,6 +264,13 @@ const IconCaptcha = (function () {
                             return;
                         }
 
+                        // Check if the challenge was autocompleted on the server.
+                        if(result.completed && !result.challenge) {
+                            clearInvalidationTimeout();
+                            showCompletionMessage();
+                            return;
+                        }
+
                         // Render the challenge.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
                         renderChallengeOnCanvas(iconsHolder, result.challenge, () => {

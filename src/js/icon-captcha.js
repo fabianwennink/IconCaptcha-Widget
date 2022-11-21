@@ -239,7 +239,7 @@ const IconCaptcha = (function () {
         function loadCaptcha(captchaTheme) {
 
             // Create the base64 payload.
-            const requestPayload = createPayload({
+            const requestPayload = encodePayload({
                 id: _captchaId,
                 action: 'LOAD',
                 theme: captchaTheme,
@@ -256,7 +256,7 @@ const IconCaptcha = (function () {
                     if (data && typeof data === 'string') {
 
                         // Decode and parse the response.
-                        const result = JSON.parse(atob(data));
+                        const result = decodePayload(data);
 
                         // If an error message was returned.
                         if (result.error) {
@@ -427,7 +427,7 @@ const IconCaptcha = (function () {
                 _captchaSelectionCursor.style.display = 'none';
 
                 // Create the base64 payload.
-                const requestPayload = createPayload({
+                const requestPayload = encodePayload({
                     id: _captchaId,
                     action: 'SELECTION',
                     x: xPos,
@@ -442,7 +442,7 @@ const IconCaptcha = (function () {
                     type: 'POST',
                     headers: createHeaders(_captchaToken),
                     data: {payload: requestPayload},
-                    success: () => showCompletionMessage(),
+                    success: (response) => showCompletionMessage(decodePayload(response)),
                     error: () => showIncorrectIconMessage()
                 });
             }
@@ -451,13 +451,20 @@ const IconCaptcha = (function () {
         /**
          * Changes the captcha state to the 'success' state. The header, parts of the
          * body and the footer will be replaced with the new success message state.
+         * @param response The captcha selection response.
          */
-        function showCompletionMessage() {
+        function showCompletionMessage(response) {
             _captchaIconHolder.classList.remove('captcha-opacity');
 
             // Unregister the selection events to prevent possible memory leaks.
             const captchaSelection = _captchaHolder.querySelector('.iconcaptcha-modal__body-selection');
             unregisterSelectionEvents(captchaSelection);
+
+            // If the response contains an expiration time, start the timer.
+            if(response?.expiredAt) {
+                const expirationTime = (response.expiredAt * 1000) - new Date().getTime(); // calculate the remaining milliseconds.
+                invalidateTimeoutId = setTimeout(() => invalidateSession(false), expirationTime);
+            }
 
             // Clear the modal, except for the input fields.
             const elements = _captchaHolder.querySelectorAll('.iconcaptcha-modal__header, .iconcaptcha-modal__footer, .iconcaptcha-modal__body');
@@ -580,7 +587,7 @@ const IconCaptcha = (function () {
             if (invalidateServer) {
 
                 // Create the base64 payload.
-                const payload = createPayload({
+                const payload = encodePayload({
                     id: _captchaId,
                     action: 'INVALIDATE',
                     token: _captchaToken,
@@ -686,12 +693,21 @@ const IconCaptcha = (function () {
         }
 
         /**
-         * Creates a Base64 encoded JSON string from the given data parameter.
+         * Encodes the given payload with base64 and JSON.
          * @param data The payload object to encode.
          * @returns {string} The encoded payload.
          */
-        function createPayload(data) {
+        function encodePayload(data) {
             return btoa(JSON.stringify({...data, ts: Date.now()}));
+        }
+
+        /**
+         * Tries to decode the given base64 and JSON encoded payload.
+         * @param data The request payload to be decoded.
+         * @return {object} The decoded payload.
+         */
+        function decodePayload(data) {
+            return JSON.parse(atob(data));
         }
 
         /**

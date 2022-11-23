@@ -182,6 +182,8 @@ const IconCaptcha = (function () {
         let submitting = false;
         let hovering = false;
 
+        let scriptLoadTime = Date.now();
+
         // Make sure the validationPath option is set.
         if (!options.general.validationPath) {
             setCaptchaError(true, 'IconCaptcha was configured incorrectly', 'The IconCaptcha option `validationPath` has not been set.');
@@ -710,7 +712,11 @@ const IconCaptcha = (function () {
          * @returns {string} The encoded payload.
          */
         function encodePayload(data) {
-            return btoa(JSON.stringify({...data, ts: Date.now()}));
+            return btoa(JSON.stringify({
+                ...data,
+                timestamp: Date.now(),
+                initTimestamp: scriptLoadTime
+            }));
         }
 
         /**

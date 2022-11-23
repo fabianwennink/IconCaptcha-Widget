@@ -476,7 +476,7 @@ const IconCaptcha = (function () {
 
             // If the response contains an expiration time, start the timer.
             if(response?.expiredAt) {
-                const expirationTime = (response.expiredAt * 1000) - new Date().getTime(); // calculate the remaining milliseconds.
+                const expirationTime = response.expiredAt - Date.now(); // calculate the remaining milliseconds.
                 invalidateTimeoutId = setTimeout(() => invalidateSession(false), expirationTime);
             }
 

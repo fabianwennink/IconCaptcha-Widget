@@ -22,7 +22,6 @@ const IconCaptcha = (function () {
             initializeDelay: 500,
             selectionResetDelay: 3000,
             loadingAnimationDelay: 1000,
-            invalidateTime: 1000 * 60 * 2,
         },
         messages: {
             initialization: {
@@ -301,7 +300,10 @@ const IconCaptcha = (function () {
                         generated = true;
 
                         // Start the invalidation timer, save the timer identifier.
-                        invalidateTimeoutId = setTimeout(() => invalidateSession(true), options.security.invalidateTime);
+                        if(result?.expiredAt) {
+                            const expirationTime = result.expiredAt - Date.now(); // calculate the remaining milliseconds.
+                            invalidateTimeoutId = setTimeout(() => invalidate(), expirationTime);
+                        }
 
                         return;
                     }
@@ -477,7 +479,7 @@ const IconCaptcha = (function () {
             // If the response contains an expiration time, start the timer.
             if(response?.expiredAt) {
                 const expirationTime = response.expiredAt - Date.now(); // calculate the remaining milliseconds.
-                invalidateTimeoutId = setTimeout(() => invalidateSession(false), expirationTime);
+                invalidateTimeoutId = setTimeout(() => invalidate(), expirationTime);
             }
 
             // Clear the modal, except for the input fields.
@@ -587,40 +589,19 @@ const IconCaptcha = (function () {
         }
 
         /**
-         * Invalidates the current captcha session and resets requests the captcha holder element to be reset.
-         * An AJAX call will be performed to invalidate the session on the server-side, after which the client-side
-         * state will be invalidated and reset.
-         * @param invalidateServer TRUE if the server-side should be invalidated or not, FALSE if not.
+         * Invalidates the current captcha, resetting the state and rebuilding the captcha holder.
          */
-        function invalidateSession(invalidateServer = true) {
+        function invalidate() {
 
             // Reset the captcha state.
             generated = false;
             startedInitialization = false;
 
-            if (invalidateServer) {
+            // Reset the captcha holder.
+            resetCaptchaHolder();
 
-                // Create the base64 payload.
-                const payload = encodePayload({
-                    id: _captchaId,
-                    action: 'INVALIDATE',
-                    token: _captchaToken,
-                });
-
-                IconCaptchaPolyfills.ajax({
-                    url: options.general.validationPath,
-                    type: 'POST',
-                    headers: createHeaders(_captchaToken),
-                    data: {payload},
-                    success: function () {
-                        IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _captchaId});
-                        resetCaptchaHolder();
-                    },
-                    error: () => processCaptchaRequestError(-1)
-                });
-            } else {
-                resetCaptchaHolder();
-            }
+            // Trigger the 'invalidated' event.
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _captchaId});
         }
 
         /**
@@ -674,7 +655,7 @@ const IconCaptcha = (function () {
                     IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _captchaId});
 
                     // Reset the captcha to the init holder.
-                    setTimeout(() => invalidateSession(false), data);
+                    setTimeout(() => invalidate(), data);
                     break;
                 case 2: // No CSRF token found while validating.
                     setCaptchaError(true,

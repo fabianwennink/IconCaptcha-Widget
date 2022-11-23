@@ -310,7 +310,7 @@ const IconCaptcha = (function () {
                         'Invalid data was returned by the captcha back-end service. ' +
                         'Make sure IconCaptcha is installed/configured properly.');
                 },
-                error: () => showIncorrectIconMessage()
+                error: () => processCaptchaRequestError(-1)
             });
         }
 
@@ -442,8 +442,20 @@ const IconCaptcha = (function () {
                     type: 'POST',
                     headers: createHeaders(_captchaToken),
                     data: {payload: requestPayload},
-                    success: (response) => showCompletionMessage(decodePayload(response)),
-                    error: () => showIncorrectIconMessage()
+                    success: (response) => {
+
+                        // Decode and parse the response.
+                        const result = decodePayload(response);
+
+                        // In the captcha was not completed.
+                        if(!result.completed) {
+                            showIncorrectIconMessage();
+                            return;
+                        }
+
+                        showCompletionMessage(result)
+                    },
+                    error: () => processCaptchaRequestError(-1)
                 });
             }
         }
@@ -602,7 +614,7 @@ const IconCaptcha = (function () {
                         IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _captchaId});
                         resetCaptchaHolder();
                     },
-                    error: () => showIncorrectIconMessage()
+                    error: () => processCaptchaRequestError(-1)
                 });
             } else {
                 resetCaptchaHolder();

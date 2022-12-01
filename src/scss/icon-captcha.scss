@@ -38,25 +38,7 @@ $dark-theme-footer-link-hover-color: #F0F0F0;
 $dark-theme-init-background-hover-color: #454545;
 $dark-theme-init-body-title-color: #DADADA;
 
-// Legacy light
-$legacy-light-theme-background-color: #FFFFFF;
-$legacy-light-theme-border-color: #D8D8D8;
-$legacy-light-theme-header-text-color: #B1B1B1;
-$legacy-light-theme-body-subtitle-color: #B1B1B1;
-$legacy-light-theme-footer-color: #A7A7A7;
-$legacy-light-theme-footer-link-color: #448AFF;
-$legacy-light-theme-footer-link-hover-color: #74A8FF;
-
-// Legacy dark
-$legacy-dark-theme-background-color: #4C4C4C;
-$legacy-dark-theme-border-color: #404040;
-$legacy-dark-theme-header-text-color: #DADADA;
-$legacy-dark-theme-body-subtitle-color: #B1B1B1;
-$legacy-dark-theme-footer-color: #A7A7A7;
-$legacy-dark-theme-footer-link-color: #FFFFFF;
-$legacy-dark-theme-footer-link-hover-color: #F0F0F0;
-
-.iconcaptcha-holder {
+.iconcaptcha-widget {
     position: relative;
     max-width: 330px;
     min-height: 50px;
@@ -347,36 +329,6 @@ $legacy-dark-theme-footer-link-hover-color: #F0F0F0;
             }
         }
 
-        &-legacy-light {
-            background: $legacy-light-theme-background-color;
-            border: 1px solid $legacy-light-theme-border-color;
-
-            .iconcaptcha-modal {
-                &__header {
-                    border-color: $legacy-light-theme-header-text-color;
-                }
-
-                &__body {
-                    &-subtitle {
-                        color: $legacy-light-theme-body-subtitle-color;
-                    }
-                }
-
-                &__footer {
-                    color: $legacy-light-theme-footer-color;
-                    border-top: 1px solid $legacy-light-theme-border-color;
-
-                    & > span a {
-                        color: $legacy-light-theme-footer-link-color;
-
-                        &:hover {
-                            color: $legacy-light-theme-footer-link-hover-color;
-                        }
-                    }
-                }
-            }
-        }
-
         &-dark {
             background: $dark-theme-background-color;
             border: 1px solid $dark-theme-border-color;
@@ -415,42 +367,7 @@ $legacy-dark-theme-footer-link-hover-color: #F0F0F0;
             }
         }
 
-        &-legacy-dark {
-            background: $legacy-dark-theme-background-color;
-            border: 1px solid $legacy-dark-theme-border-color;
-
-            .iconcaptcha-modal {
-                &__header {
-                    border-color: $legacy-dark-theme-border-color;
-
-                    span {
-                        color: $legacy-dark-theme-header-text-color;
-                    }
-                }
-
-                &__body {
-                    &-subtitle {
-                        color: $legacy-dark-theme-body-subtitle-color;
-                    }
-                }
-
-                &__footer {
-                    color: $legacy-dark-theme-footer-color;
-                    border-top: 1px solid $legacy-dark-theme-border-color;
-
-                    & > span a {
-                        color: $legacy-dark-theme-footer-link-color;
-
-                        &:hover {
-                            color: $legacy-dark-theme-footer-link-hover-color;
-                        }
-                    }
-                }
-            }
-        }
-
-        &-light,
-        &-legacy-light {
+        &-light {
 
             &.iconcaptcha-init {
                 &:hover {
@@ -498,8 +415,7 @@ $legacy-dark-theme-footer-link-hover-color: #F0F0F0;
             }
         }
 
-        &-dark,
-        &-legacy-dark {
+        &-dark {
 
             &.iconcaptcha-init {
                 &:hover {
@@ -543,40 +459,6 @@ $legacy-dark-theme-footer-link-hover-color: #F0F0F0;
             &.iconcaptcha-error {
                 .iconcaptcha-modal__body-title {
                     color: $dark-theme-error-color;
-                }
-            }
-        }
-
-        &-legacy-light,
-        &-legacy-dark {
-            border-radius: 0;
-
-            &.iconcaptcha-init {
-                .iconcaptcha-modal__body-title {
-                    text-transform: uppercase;
-                }
-            }
-
-            .iconcaptcha-modal {
-                &__header {
-                    border-bottom-width: 1px;
-                    border-bottom-style: solid;
-
-                    span {
-                        font-weight: 500;
-                        font-size: 11px;
-                    }
-                }
-
-                &__body {
-                    &-title {
-                        font-weight: 500;
-                        text-transform: none;
-                    }
-                }
-
-                &__footer {
-                    padding: 5px;
                 }
             }
         }

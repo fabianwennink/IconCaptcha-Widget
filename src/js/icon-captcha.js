@@ -641,10 +641,8 @@ const IconCaptcha = (function () {
          * @param data The payload of the error.
          */
         function processCaptchaRequestError(code, data) {
-            code = parseInt(code);
-
             switch (code) {
-                case 1: // Too many incorrect selections, timeout.
+                case 'too-many-attempts': // Too many incorrect selections, timeout.
                     showIncorrectIconMessage(options.messages.timeout.title, options.messages.timeout.subtitle, false);
 
                     // Remove the header from the captcha.
@@ -657,9 +655,9 @@ const IconCaptcha = (function () {
                     // Reset the captcha to the init holder.
                     setTimeout(() => invalidate(), data);
                     break;
-                case 2: // No CSRF token found while validating.
+                case 'invalid-form-token': // No CSRF token found while validating.
                     setCaptchaError(true,
-                        'The captcha token is missing or is incorrect.',
+                        'Captcha form token is missing or incorrect.',
                         'A server request was made without including a captcha token, however this option is enabled.');
                     break;
                 default: // Any other error.
@@ -678,7 +676,7 @@ const IconCaptcha = (function () {
         function setCaptchaError(triggerEvent, displayError, consoleError = '') {
 
             // Display and log the error.
-            showIncorrectIconMessage('IconCaptcha Error', displayError, false);
+            showIncorrectIconMessage('Captcha Error', displayError, false);
             console.error('IconCaptcha Error: ' + (consoleError !== '') ? consoleError : displayError);
 
             // Trigger: error

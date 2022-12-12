@@ -165,10 +165,12 @@ const IconCaptcha = (function () {
      */
     const _init = function (element, id, options) {
 
-        const _captchaId = id + 1;
         const _captchaHolder = element;
         let _captchaIconHolder;
         let _captchaSelectionCursor;
+
+        let _widgetId;
+        let _challengeId;
         let _captchaToken;
 
         let startedInitialization = false;
@@ -196,6 +198,8 @@ const IconCaptcha = (function () {
          * Initializes the plugin.
          */
         function init() {
+
+            _widgetId = _widgetId || generateWidgetId();
 
             // Get the CSRF token, if available.
             _captchaToken = document.querySelector('input[name="_iconcaptcha-token"]')?.value;
@@ -233,6 +237,16 @@ const IconCaptcha = (function () {
         }
 
         /**
+         * Generates a random identifier, in the format 'xxxx-xxxx-xxxx-xxxx'.
+         * @returns {string} The identifier.
+         * @link https://stackoverflow.com/q/38228180/3974827
+         */
+        function generateWidgetId() {
+            const segment = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+            return `${segment()}-${segment()}-${segment()}-${segment()}`;
+        }
+
+        /**
          * Requests the captcha data from the server via an AJAX call. Based on the result of the
          * request, the captcha will either be initialized or an error message will be shown.
          * @param captchaTheme The theme name which is used by the captcha instance.
@@ -241,7 +255,7 @@ const IconCaptcha = (function () {
 
             // Create the base64 payload.
             const requestPayload = encodePayload({
-                id: _captchaId,
+                widgetId: _widgetId,
                 action: 'LOAD',
                 theme: captchaTheme,
                 token: _captchaToken,
@@ -259,6 +273,9 @@ const IconCaptcha = (function () {
                         // Decode and parse the response.
                         const result = decodePayload(data);
 
+                        // Set the captcha identifier.
+                        _challengeId = result.id;
+
                         // If an error message was returned.
                         if (result.error) {
                             processCaptchaRequestError(result.error, result.data);
@@ -271,6 +288,10 @@ const IconCaptcha = (function () {
                             showCompletionMessage();
                             return;
                         }
+
+                        // Update the form fields with the captcha data.
+                        _captchaHolder.querySelector('input[name="ic-cid"]')?.setAttribute('value', _challengeId);
+                        _captchaHolder.querySelector('input[name="ic-wid"]')?.setAttribute('value', _widgetId);
 
                         // Render the challenge.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
@@ -288,7 +309,7 @@ const IconCaptcha = (function () {
 
                         // Event: init
                         if (!generated) {
-                            IconCaptchaPolyfills.trigger(_captchaHolder, 'init', {captchaId: _captchaId});
+                            IconCaptchaPolyfills.trigger(_captchaHolder, 'init', {captchaId: _challengeId});
                         }
 
                         // Determine the width of the image.
@@ -371,9 +392,10 @@ const IconCaptcha = (function () {
             captchaHTML.push(
                 "</div>",
                 "<div class='iconcaptcha-modal__fields'>",
-                "<input type='hidden' name='ic-hf-se' required />",
-                `<input type='hidden' name='ic-hf-id' value='${_captchaId}' required />`,
-                "<input type='hidden' name='ic-hf-hp' required />",
+                "<input type='hidden' name='ic-rq' value='1' required style='display:none;' />",
+                "<input type='hidden' name='ic-wid' required style='display:none;' />",
+                `<input type='hidden' name='ic-cid' required style='display:none;' />`,
+                "<input type='hidden' name='ic-hp' style='display:none;' />",
                 "</div>"
             );
 
@@ -390,7 +412,6 @@ const IconCaptcha = (function () {
          */
         function resetCaptchaHolder() {
             _captchaHolder.classList.remove('iconcaptcha-error');
-            _captchaHolder.querySelector("input[name='ic-hf-se']").setAttribute('value', null);
 
             // Reset the captcha body.
             IconCaptchaPolyfills.empty(_captchaIconHolder);
@@ -400,7 +421,7 @@ const IconCaptcha = (function () {
             init();
 
             // Trigger: refreshed
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'refreshed', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'refreshed', {captchaId: _challengeId});
         }
 
         /**
@@ -423,16 +444,13 @@ const IconCaptcha = (function () {
                 xPos = Math.round(xPos);
                 yPos = Math.round(yPos);
 
-                // Update the form fields with the captcha data.
-                _captchaHolder.querySelector('input[name="ic-hf-se"]').setAttribute('value', [xPos, yPos, captchaImageWidth].join(','));
-                _captchaHolder.querySelector('input[name="ic-hf-id"]').setAttribute('value', _captchaId);
-
                 // Hide the mouse cursor.
                 _captchaSelectionCursor.style.display = 'none';
 
                 // Create the base64 payload.
                 const requestPayload = encodePayload({
-                    id: _captchaId,
+                    widgetId: _widgetId,
+                    challengeId: _challengeId,
                     action: 'SELECTION',
                     x: xPos,
                     y: yPos,
@@ -506,7 +524,7 @@ const IconCaptcha = (function () {
             submitting = false;
 
             // Trigger: success
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'success', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'success', {captchaId: _challengeId});
         }
 
         /**
@@ -535,7 +553,7 @@ const IconCaptcha = (function () {
             submitting = false;
 
             // Trigger: error
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _challengeId});
 
             // Reset the captcha.
             if (reset) {
@@ -593,6 +611,9 @@ const IconCaptcha = (function () {
          */
         function invalidate() {
 
+            _widgetId = undefined;
+            _challengeId = undefined;
+
             // Reset the captcha state.
             generated = false;
             startedInitialization = false;
@@ -601,7 +622,7 @@ const IconCaptcha = (function () {
             resetCaptchaHolder();
 
             // Trigger the 'invalidated' event.
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _challengeId});
         }
 
         /**
@@ -628,7 +649,7 @@ const IconCaptcha = (function () {
             submitting = false;
             hovering = false;
 
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'reset', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'reset', {captchaId: _challengeId});
 
             // Re-init the captcha.
             init();
@@ -650,7 +671,7 @@ const IconCaptcha = (function () {
                     captchaHeader.parentNode.removeChild(captchaHeader);
 
                     // Trigger: timeout
-                    IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _captchaId});
+                    IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _challengeId});
 
                     // Reset the captcha to the init holder.
                     setTimeout(() => invalidate(), data);
@@ -681,7 +702,7 @@ const IconCaptcha = (function () {
 
             // Trigger: error
             if (triggerEvent) {
-                IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _captchaId});
+                IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _challengeId});
             }
         }
 
@@ -774,7 +795,7 @@ const IconCaptcha = (function () {
                     return;
 
                 // Trigger: selected
-                IconCaptchaPolyfills.trigger(_captchaHolder, 'selected', {captchaId: _captchaId});
+                IconCaptchaPolyfills.trigger(_captchaHolder, 'selected', {captchaId: _challengeId});
 
                 if (options.security.loadingAnimationDelay && options.security.loadingAnimationDelay > 0) {
                     addLoadingSpinner();
@@ -847,7 +868,7 @@ const IconCaptcha = (function () {
         }
 
         return {
-            id: _captchaId,
+            id: _widgetId,
             reset: resetCaptcha
         };
     }

@@ -1,6 +1,6 @@
 # IconCaptcha - Front-End Package
 
-[![Version](https://img.shields.io/badge/Version-3.1.0-orange.svg?style=flat-square)]()
+[![Version](https://img.shields.io/badge/Version-3.1.1-orange.svg?style=flat-square)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]()
 [![Support](https://img.shields.io/badge/Support-PayPal-yellow.svg?style=flat-square)](https://paypal.me/nlgamevideosnl)
 [![Support](https://img.shields.io/badge/Support-Buy_Me_A_Coffee-yellow.svg?style=flat-square)](https://www.buymeacoffee.com/fabianwennink)

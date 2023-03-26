@@ -1,6 +1,6 @@
 /**
- * IconCaptcha Plugin: v3.1.0
- * Copyright © 2022, Fabian Wennink (https://www.fabianwennink.nl)
+ * IconCaptcha Plugin: v3.1.1
+ * Copyright © 2023, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license
  */
@@ -263,10 +263,11 @@ const IconCaptcha = (function () {
 
                         // Create the base64 payload.
                         const imageRequestPayload = createPayload({i: _captchaId, tk: _captchaToken});
+                        const urlParamSeparator = options.general.validationPath.indexOf('?') > -1 ? '&' : '?';
 
                         // Load the captcha image.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
-                        iconsHolder.style.backgroundImage = `url(${options.general.validationPath}?payload=${imageRequestPayload})`;
+                        iconsHolder.style.backgroundImage = `url(${options.general.validationPath}${urlParamSeparator}payload=${imageRequestPayload})`;
                         removeLoadingSpinnerOnImageLoad(iconsHolder);
 
                         // Add the selection area to the captcha holder.

@@ -1,6 +1,6 @@
 /**
- * Icon Captcha Plugin: v3.1.0
- * Copyright © 2022, Fabian Wennink (https://www.fabianwennink.nl)
+ * Icon Captcha Plugin: v3.1.1
+ * Copyright © 2023, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license
  */
@@ -21,7 +21,7 @@ const JS_INPUT = ['src/js/polyfill.js', 'src/js/*.js'];
 const JS_OUTPUT = 'dist/js';
 const FILE_OUTPUT_NAME = 'icon-captcha';
 
-const HEADER = '/*! IconCaptcha v3.1.0 | (c) 2022, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha/license */\n';
+const HEADER = '/*! IconCaptcha v3.1.1 | (c) 2023, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha/license */\n';
 
 /*************************************************/
 

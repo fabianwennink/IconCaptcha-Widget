@@ -237,16 +237,6 @@ const IconCaptcha = (function () {
         }
 
         /**
-         * Generates a random identifier, in the format 'xxxx-xxxx-xxxx-xxxx'.
-         * @returns {string} The identifier.
-         * @link https://stackoverflow.com/q/38228180/3974827
-         */
-        function generateWidgetId() {
-            const segment = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-            return `${segment()}-${segment()}-${segment()}-${segment()}`;
-        }
-
-        /**
          * Requests the captcha data from the server via an AJAX call. Based on the result of the
          * request, the captcha will either be initialized or an error message will be shown.
          * @param captchaTheme The theme name which is used by the captcha instance.
@@ -611,7 +601,6 @@ const IconCaptcha = (function () {
          */
         function invalidate() {
 
-            _widgetId = undefined;
             _challengeId = undefined;
 
             // Reset the captcha state.
@@ -639,6 +628,8 @@ const IconCaptcha = (function () {
          * Resets the instance and rebuilds the captcha holder.
          */
         function resetCaptcha() {
+
+            _challengeId = undefined;
 
             // Reset the invalidation timer.
             clearInvalidationTimeout();
@@ -704,6 +695,23 @@ const IconCaptcha = (function () {
             if (triggerEvent) {
                 IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _challengeId});
             }
+        }
+
+        /**
+         * Generates a random widget identifier. The identifier follows the UUID v4 format.
+         * Note: While it is not cryptographically secure, when combined with the challenge ID, it provides sufficient randomness.
+         * @returns {string} The widget identifier.
+         */
+        function generateWidgetId() {
+            let uuid = '', random;
+            for (let i = 0; i < 32; i++) {
+                if (i === 8 || i === 12 || i === 16 || i === 20) {
+                    uuid += '-';
+                }
+                random = Math.random() * 16 | 0;
+                uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
+            }
+            return uuid;
         }
 
         /**

@@ -264,7 +264,7 @@ const IconCaptcha = (function () {
                         const result = decodePayload(data);
 
                         // Set the captcha identifier.
-                        _challengeId = result.id;
+                        _challengeId = result.identifier;
 
                         // If an error message was returned.
                         if (result.error) {

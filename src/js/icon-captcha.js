@@ -378,19 +378,19 @@ const IconCaptcha = (function () {
                 );
             }
 
-            // Adds the last portion of the HTML to the array.
-            captchaHTML.push(
-                "</div>",
+            // Adds the first portion of the hidden fields to the array.
+            captchaHTML.push("</div>",
                 "<div class='iconcaptcha-modal__fields'>",
                 "<input type='hidden' name='ic-rq' value='1' required style='display:none;' />",
-                "<input type='hidden' name='ic-wid' required style='display:none;' />",
-                `<input type='hidden' name='ic-cid' required style='display:none;' />`,
-                "<input type='hidden' name='ic-hp' style='display:none;' />",
-                "</div>"
             );
 
+            // Add the remaining hidden fields to the array.
+            for (let field of ['wid', 'cid', 'hp']) {
+                captchaHTML.push(`<input type='hidden' name='ic-${field}' required style='display:none;' />`)
+            }
+
             // Close the holder.
-            captchaHTML.push("</div>");
+            captchaHTML.push("</div></div>");
 
             _captchaHolder.innerHTML = captchaHTML.join('');
             _captchaIconHolder = _captchaHolder.querySelector('.iconcaptcha-modal__body');

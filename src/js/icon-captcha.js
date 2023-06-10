@@ -35,7 +35,7 @@ const IconCaptcha = (function () {
                 subtitle: "You've selected the wrong image."
             },
             timeout: {
-                title: 'Please wait 60 sec.',
+                title: 'Please wait.',
                 subtitle: 'You made too many incorrect selections.'
             }
         }

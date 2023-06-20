@@ -46,124 +46,173 @@ const IconCaptcha = (function () {
     const checkmarkSVG = '<svg viewBox="0 0 98.5 98.5" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path class="checkmark" d="M81.7 17.8C73.5 9.3 62 4 49.2 4 24.3 4 4 24.3 4 49.2s20.3 45.2 45.2 45.2 45.2-20.3 45.2-45.2c0-8.6-2.4-16.6-6.5-23.4L45.6 68.2 24.7 47.3" fill="none" stroke-miterlimit="10" stroke-width="8"/></svg>';
 
     /**
-     * Initializes the IconCaptcha plugin, called via jQuery hook.
-     * @param elements An array of DOM elements, each element represents a single captcha holder.
-     * @param options Object containing the options for the captcha.
-     * @returns IconCaptcha The plugin instance.
+     * Initializes an IconCaptcha instance, called via jQuery hook.
+     * @param {HTMLElement[]} elements An array of DOM elements, each element represents a single captcha widget holder.
+     * @param {string} selector The selector of the captcha holder, in which the widgets will be generated.
+     * @param {Object} options An object containing configuration options for the widgets.
+     * @returns {Object} The IconCaptcha instance (for method chaining).
      */
-    exports.$init = function (elements, options) {
-        _initShared(this, elements, options);
-        return this;
+    exports.$init = function (elements, selector, options) {
+        return _initShared(this, elements, selector, options);
     }
 
     /**
-     * Initializes the IconCaptcha plugin.
-     * @param selector The selector of the captcha holder, in which the captcha will be generated.
-     * @param options Object containing the options for the captcha.
-     * @returns IconCaptcha The plugin instance.
+     * Initializes an IconCaptcha instance.
+     * @param {string} selector The selector of the captcha holder, in which the widgets will be generated.
+     * @param {Object} options An object containing configuration options for the widgets.
+     * @returns {Object} The IconCaptcha instance (for method chaining).
      */
     exports.init = function (selector, options) {
-        _initShared(this, document.querySelectorAll(selector), options);
-        return this;
+        return _initShared(this, document.querySelectorAll(selector), selector, options);
     };
 
     /**
-     * Resets every initialized IconCaptcha, if no specific IconCaptcha identifier is given.
-     * In case an identifier is given, only the instance matching the identifier will be reset.
-     * @param id (optional) The identifier of an IconCaptcha instance, as a number.
-     * @returns IconCaptcha The plugin instance.
+     * Resets the specified widget, or all widgets in all captcha instances if no widget identifier is provided.
+     * @param {string} [widgetId] The identifier of the widget to reset.
+     * @returns {IconCaptcha} The plugin instance (for method chaining).
      */
-    exports.reset = function (id) {
+    exports.reset = function (widgetId) {
 
         // Make sure there are instances to reset.
-        if (this.instances === undefined) {
+        if (typeof this.instances === 'undefined') {
             console.error('IconCaptcha has not yet been initialized. Cannot use \'reset\' yet.');
             return this;
         }
 
-        // If no identifier is given, reset all instances.
-        if (id === undefined) {
-            _forEach(this.instances, (instance) => {
-                instance?.reset();
-            });
-        } else {
-            // Try to reset the instance with the given identifier.
-            this.instances.find(instance => instance.id === id)?.reset();
-        }
+        // Process all widgets.
+        _eachWidget(this.instances, (widget) => {
+            // Reset if the widget matches, or if no widget was specified.
+            if(widgetId === undefined || widget.id === widgetId) {
+                widget?.reset();
+            }
+        });
 
         return this;
     }
 
     /**
-     * Binds the given callback function to the given event type. When the specific
-     * event type is fired, the callback function will be executed.
-     * @param event The event type name.
-     * @param callback The callback function.
-     * @returns IconCaptcha The plugin instance.
+     * Binds an event listener to all widgets in all captcha instances.
+     * @param {string} event The name of the event to bind to.
+     * @param {Function} callback The function to be called when the event is triggered.
+     * @returns {IconCaptcha} The plugin instance (for method chaining).
      */
     exports.bind = function (event, callback) {
 
         // Make sure there are instances to reset.
-        if (this.nodes === undefined) {
+        if (typeof this.instances === 'undefined') {
             console.error('IconCaptcha has not yet been initialized. Cannot use \'bind\' yet.');
             return this;
         }
 
-        _forEach(this.nodes, (element) => {
-            element.addEventListener(event, callback);
+        // Bind the event to every widget.
+        _eachWidget(this.instances, (widget) => {
+            widget.element.addEventListener(event, callback);
         });
 
         return this;
     }
 
     /**
-     * Loops through every item in the given array and executes the callback function for each item.
-     * @param arr The array which will be iterated.
-     * @param callback The function which will be called every iteration, the array item and index will be passed to the callback.
+     * Initializes a captcha instance its widgets.
+     * @param {Object} self The plugin instance.
+     * @param {HTMLElement[]} elements The DOM elements to render the captcha widgets in.
+     * @param {string} selector The element selector of the widgets.
+     * @param {Object} options An object containing configuration options for the widgets.
+     * @returns {Object} The IconCaptcha instance.
      * @private
      */
-    const _forEach = function (arr, callback) {
-        for (let i = 0; i < arr.length; i++) {
-            callback(arr[i], i);
+    const _initShared = function (self, elements, selector, options) {
+
+        // Prevent initializing if already initialized.
+        if (typeof self.instances !== 'undefined' && self.instances.hasOwnProperty(selector)) {
+            console.error(`IconCaptcha has already been initialized on selector '${selector}'.`);
+            return;
+        }
+
+        // Initialize the instances object if still empty.
+        if(typeof self.instances === 'undefined') {
+            self.instances = {};
+        }
+
+        // Combine the given options with the default ones.
+        let mergedOptions = IconCaptchaPolyfills.extend({}, defaults, (options || {}));
+
+        // Create a new entry in the instances object.
+        self.instances[selector] = [];
+
+        // Initialize each captcha.
+        for (let i = 0; i < elements.length; i++) {
+            self.instances[selector].push(
+                _initWidget(elements[i], i, mergedOptions)
+            );
+        }
+
+        return _initInstance(self.instances[selector]);
+    }
+
+    /**
+     * Iterates over each widget in the provided instances and calls the callback function.
+     * @param {Object} instances The object containing captcha instances.
+     * @param {Function} callback The function which will be called per widget. The widget will be passed to the callback as the first parameter.
+     * @private
+     */
+    const _eachWidget = function (instances, callback) {
+        for (const instance of Object.values(instances)) {
+            for (const widget of Object.values(instance)) {
+                callback(widget);
+            }
         }
     };
 
     /**
-     *
-     * @param self The plugin instance.
-     * @param elements The DOM elements to render the IconCaptcha instances in.
-     * @param options The plugin options.
+     * Initializes an instance of the captcha with the given widgets.
+     * @param {Object[]} widgets An array of rendered widgets.
+     * @returns {Object} A captcha instance object with public methods.
      * @private
      */
-    const _initShared = function (self, elements, options) {
+    const _initInstance = function(widgets) {
+        const exports = {};
 
-        // Prevent initializing if already initialized.
-        if (self.nodes) {
-            console.error('IconCaptcha has already been initialized.');
-            return;
+        /**
+         * Resets the specified widget, or all widgets if no widget identifier is provided.
+         * @param {string} [widgetId] The identifier of the widget to reset.
+         * @returns {Object} The captcha instance (for method chaining).
+         */
+        exports.reset = function (widgetId) {
+            for(const widget of widgets) {
+                // Reset if the widget matches, or if no widget was specified.
+                if(widgetId === undefined || widget.id === widgetId) {
+                    widget?.reset();
+                }
+            }
+            return this;
         }
 
-        self.instances = [];
-        self.nodes = elements;
+        /**
+         * Binds an event listener to all widgets in the captcha instance.
+         * @param {string} event The name of the event to bind to.
+         * @param {Function} callback The function to be called when the event is triggered.
+         * @returns {Object} The captcha instance (for method chaining).
+         */
+        exports.bind = function (event, callback) {
+            for(const widget of widgets) {
+                widget.element.addEventListener(event, callback);
+            }
+            return this;
+        }
 
-        let _options = IconCaptchaPolyfills.extend({}, defaults, (options || {}));
-
-        // Initialize each captcha.
-        _forEach(self.nodes, (element, id) => {
-            self.instances.push(
-                _init(element, id, _options)
-            );
-        });
+        return exports;
     }
 
     /**
-     * Initializes the captcha for a given DOM element.
-     * @param element The DOM element which represents the captcha holder.
-     * @param id The identifier of the captcha.
-     * @param options Object containing the options for the captcha.
+     * Initializes the widget for the specified element.
+     * @param {HTMLElement} element The DOM element to generate the widget into.
+     * @param {string} id The identifier of the widget.
+     * @param {Object} options An object containing the configuration options for the widget.
+     * @returns {Object} The initialized captcha widget.
      * @private
      */
-    const _init = function (element, id, options) {
+    const _initWidget = function (element, id, options) {
 
         const _captchaHolder = element;
         let _captchaIconHolder;
@@ -299,7 +348,7 @@ const IconCaptcha = (function () {
 
                         // Event: init
                         if (!generated) {
-                            IconCaptchaPolyfills.trigger(_captchaHolder, 'init', {captchaId: _challengeId});
+                            IconCaptchaPolyfills.trigger(_captchaHolder, 'init', {captchaId: _widgetId});
                         }
 
                         // Determine the width of the image.
@@ -411,7 +460,7 @@ const IconCaptcha = (function () {
             init();
 
             // Trigger: refreshed
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'refreshed', {captchaId: _challengeId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'refreshed', {captchaId: _widgetId});
         }
 
         /**
@@ -492,9 +541,9 @@ const IconCaptcha = (function () {
 
             // Clear the modal, except for the input fields.
             const elements = _captchaHolder.querySelectorAll('.iconcaptcha-modal__header, .iconcaptcha-modal__footer, .iconcaptcha-modal__body');
-            _forEach(elements, function (el) {
-                el.parentNode.removeChild(el);
-            });
+            for (const element of elements) {
+                element.parentNode.removeChild(element);
+            }
 
             // Add the success message to the element.
             _captchaHolder.classList.add('iconcaptcha-success');
@@ -514,7 +563,7 @@ const IconCaptcha = (function () {
             submitting = false;
 
             // Trigger: success
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'success', {captchaId: _challengeId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'success', {captchaId: _widgetId});
         }
 
         /**
@@ -543,7 +592,7 @@ const IconCaptcha = (function () {
             submitting = false;
 
             // Trigger: error
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _challengeId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _widgetId});
 
             // Reset the captcha.
             if (reset) {
@@ -611,7 +660,7 @@ const IconCaptcha = (function () {
             resetCaptchaHolder();
 
             // Trigger the 'invalidated' event.
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _challengeId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _widgetId});
         }
 
         /**
@@ -640,7 +689,7 @@ const IconCaptcha = (function () {
             submitting = false;
             hovering = false;
 
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'reset', {captchaId: _challengeId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'reset', {captchaId: _widgetId});
 
             // Re-init the captcha.
             init();
@@ -662,7 +711,7 @@ const IconCaptcha = (function () {
                     captchaHeader.parentNode.removeChild(captchaHeader);
 
                     // Trigger: timeout
-                    IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _challengeId});
+                    IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _widgetId});
 
                     // Reset the captcha to the init holder.
                     setTimeout(() => invalidate(), data);
@@ -693,7 +742,7 @@ const IconCaptcha = (function () {
 
             // Trigger: error
             if (triggerEvent) {
-                IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _challengeId});
+                IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _widgetId});
             }
         }
 
@@ -803,7 +852,7 @@ const IconCaptcha = (function () {
                     return;
 
                 // Trigger: selected
-                IconCaptchaPolyfills.trigger(_captchaHolder, 'selected', {captchaId: _challengeId});
+                IconCaptchaPolyfills.trigger(_captchaHolder, 'selected', {captchaId: _widgetId});
 
                 if (options.security.loadingAnimationDelay && options.security.loadingAnimationDelay > 0) {
                     addLoadingSpinner();
@@ -877,7 +926,8 @@ const IconCaptcha = (function () {
 
         return {
             id: _widgetId,
-            reset: resetCaptcha
+            element: element,
+            reset: resetCaptcha,
         };
     }
 
@@ -891,13 +941,13 @@ if (window.jQuery != null) {
             iconCaptcha: function (options) {
 
                 // Extract the DOM elements from the jQuery object.
-                let nodes = [];
+                let instances = [];
                 $.each(this, (_, element) => {
-                    nodes.push(element);
+                    instances.push(element);
                 });
 
                 // Initialize IconCaptcha.
-                return IconCaptcha.$init(nodes, options);
+                return IconCaptcha.$init(instances, this.selector, options);
             }
         });
     })(jQuery);

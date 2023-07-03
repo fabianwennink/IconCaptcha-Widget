@@ -1,5 +1,5 @@
 /**
- * IconCaptcha Plugin: v3.1.1
+ * IconCaptcha Plugin: v3.1.2
  * Copyright © 2023, Fabian Wennink (https://www.fabianwennink.nl)
  *
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license

@@ -49,12 +49,11 @@ const IconCaptcha = (function () {
     /**
      * Initializes an IconCaptcha instance, called via jQuery hook.
      * @param {HTMLElement[]} elements An array of DOM elements, each element represents a single captcha widget holder.
-     * @param {string} selector The selector of the captcha holder, in which the widgets will be generated.
      * @param {Object} options An object containing configuration options for the widgets.
      * @returns {Object} The IconCaptcha instance (for method chaining).
      */
-    exports.$init = function (elements, selector, options) {
-        return _initShared(this, elements, selector, options);
+    exports.$init = function (elements, options) {
+        return _initShared(this, elements, options);
     }
 
     /**
@@ -64,7 +63,7 @@ const IconCaptcha = (function () {
      * @returns {Object} The IconCaptcha instance (for method chaining).
      */
     exports.init = function (selector, options) {
-        return _initShared(this, document.querySelectorAll(selector), selector, options);
+        return _initShared(this, document.querySelectorAll(selector), options);
     };
 
     /**
@@ -117,16 +116,18 @@ const IconCaptcha = (function () {
      * Initializes a captcha instance its widgets.
      * @param {Object} self The plugin instance.
      * @param {HTMLElement[]} elements The DOM elements to render the captcha widgets in.
-     * @param {string} selector The element selector of the widgets.
      * @param {Object} options An object containing configuration options for the widgets.
      * @returns {Object} The IconCaptcha instance.
      * @private
      */
-    const _initShared = function (self, elements, selector, options) {
+    const _initShared = function (self, elements, options) {
 
         // Prevent initializing if already initialized.
-        if (typeof self.instances !== 'undefined' && self.instances.hasOwnProperty(selector)) {
-            console.error(`IconCaptcha has already been initialized on selector '${selector}'.`);
+        if (
+            typeof self.instances !== 'undefined' &&
+            elements.some(element => element.querySelector('.iconcaptcha-modal') !== null)
+        ) {
+            console.error(`IconCaptcha has already been initialized on one or more elements in this list:`, elements);
             return;
         }
 
@@ -139,16 +140,17 @@ const IconCaptcha = (function () {
         let mergedOptions = IconCaptchaPolyfills.extend({}, defaults, (options || {}));
 
         // Create a new entry in the instances object.
-        self.instances[selector] = [];
+        const index = Object.values(self.instances).length;
+        self.instances[index] = [];
 
         // Initialize each captcha.
         for (let i = 0; i < elements.length; i++) {
-            self.instances[selector].push(
+            self.instances[index].push(
                 _initWidget(elements[i], i, mergedOptions)
             );
         }
 
-        return _initInstance(self.instances[selector]);
+        return _initInstance(self.instances[index]);
     }
 
     /**
@@ -888,7 +890,7 @@ if (window.jQuery != null) {
                 });
 
                 // Initialize IconCaptcha.
-                return IconCaptcha.$init(instances, this.selector, options);
+                return IconCaptcha.$init(instances, options);
             }
         });
     })(jQuery);

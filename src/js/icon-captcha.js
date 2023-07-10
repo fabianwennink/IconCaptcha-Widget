@@ -63,7 +63,8 @@ const IconCaptcha = (function () {
      * @returns {Object} The IconCaptcha instance (for method chaining).
      */
     exports.init = function (selector, options) {
-        return _initShared(this, document.querySelectorAll(selector), options);
+        const elements = Array.from(document.querySelectorAll(selector));
+        return _initShared(this, elements, options);
     };
 
     /**

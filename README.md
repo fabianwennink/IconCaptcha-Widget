@@ -1,23 +1,36 @@
-# IconCaptcha - Front-End Package
+<br/>
 
-[![Version](https://img.shields.io/badge/Version-3.1.0-orange.svg?style=flat-square)]()
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)]()
-[![Support](https://img.shields.io/badge/Support-PayPal-yellow.svg?style=flat-square)](https://paypal.me/nlgamevideosnl)
-[![Support](https://img.shields.io/badge/Support-Buy_Me_A_Coffee-yellow.svg?style=flat-square)](https://www.buymeacoffee.com/fabianwennink)
+<p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://i.imgur.com/k8sIUQI.png">
+      <source media="(prefers-color-scheme: light)" srcset="https://i.imgur.com/RMUALSz.png">
+      <img alt="IconCaptcha Logo" src="https://i.imgur.com/RMUALSz.png">
+    </picture>
+</p>
 
-[![Sonar Quality](https://img.shields.io/sonar/alert_status/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud)](https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End)
-[![Sonar Security](https://img.shields.io/sonar/security_rating/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud&color=%234c1)](https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End)
-[![Sonar Bugs](https://img.shields.io/sonar/bugs/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud)](https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End)
-[![Sonar Vulnerabilities](https://img.shields.io/sonar/vulnerabilities/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud)](https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End)
+<p align="center">
+    <strong>A self-hosted, customizable, easy-to-implement and user-friendly captcha.</strong>
+</p>
 
-<br><img src="http://i.imgur.com/RMUALSz.png" />
+<p align="center">
+    <a href="https://github.com/fabianwennink/IconCaptcha-Plugin-Front-End/releases"><img src="https://img.shields.io/badge/version-4.0.0-orange.svg?style=flat-square" alt="Version" /></a>
+    <a href="https://fabianwennink.nl/projects/IconCaptcha/license"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License" /></a>
+    <a href="https://paypal.me/nlgamevideosnl"><img src="https://img.shields.io/badge/support-PayPal-lightblue.svg?style=flat-square" alt="Support via PayPal" /></a>
+    <a href="https://www.buymeacoffee.com/fabianwennink"><img src="https://img.shields.io/badge/support-Buy_Me_A_Coffee-lightblue.svg?style=flat-square" alt="Buy me a coffee" /></a>
+</p>
 
-IconCaptcha is a self-hosted captcha which is faster, more user-friendly and more customizable than other captchas. Users no longer have to read any annoying
-text images, solve difficult math equations or play any puzzle games. IconCaptcha is simple: Compare up to 8 icons and select the icon type shown the least amount of times.
+<p align="center">
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/alert_status/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Quality" /></a>
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/security_rating/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud&color=%234c1" alt="Sonar Security" /></a>
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/bugs/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Bugs" /></a>
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/vulnerabilities/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Vulnerabilities" /></a>
+</p>
 
-This repository contains the front-end source of the IconCaptcha plugins for PHP and ASP.NET. For the installation guide of this package, follow the installation guide of the respective back-end package you want to use.
+___
 
-<img src="https://i.imgur.com/9RGFZSC.png" title="IconCaptcha" alt="IconCaptcha" />
+Introducing IconCaptcha, a self-hosted captcha solution that's designed to be fast, user-friendly, and highly customizable. Unlike other captchas, IconCaptcha spares users the need of deciphering hard-to-read text images, solving complex math problems, or engaging with perplexing puzzle games. Instead, it's as straightforward as comparing up to 8 icons and selecting the least common one.
+
+This repository contains the source for the IconCaptcha client-side widget, and is to be used in combination with a server-side implementation. To implement IconCaptcha on your website, follow the installation guide of the respective server-side package you wish to use.
 
 ___
 

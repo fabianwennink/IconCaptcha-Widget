@@ -23,7 +23,7 @@ const IconCaptcha = (function () {
             selectionResetDelay: 3000,
             loadingAnimationDelay: 1000,
         },
-        messages: {
+        locale: {
             initialization: {
                 loading: 'Loading challenge...',
                 verify: 'Verify that you are human.'
@@ -393,7 +393,7 @@ const IconCaptcha = (function () {
                 "<div class='iconcaptcha-modal__body-info'>",
                 `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>`,
                 "</div>",
-                `<div class='iconcaptcha-modal__body-title'>${options.messages.initialization.verify}</div>`,
+                `<div class='iconcaptcha-modal__body-title'>${options.locale.initialization.verify}</div>`,
                 "</div>",
                 "</div>"
             ];
@@ -414,7 +414,7 @@ const IconCaptcha = (function () {
             captchaHTML.push(
                 "<div class='iconcaptcha-modal'>",
                 "<div class='iconcaptcha-modal__header'>",
-                `<span>${options.messages.header}</span>`,
+                `<span>${options.locale.header}</span>`,
                 "</div>",
                 "<div class='iconcaptcha-modal__body'>",
                 "<canvas class='iconcaptcha-modal__body-icons'></canvas>",
@@ -555,7 +555,7 @@ const IconCaptcha = (function () {
             const captchaModal = _captchaHolder.querySelector('.iconcaptcha-modal');
             captchaModal.innerHTML +=
                 `<div class="iconcaptcha-modal__body">` +
-                `<div class="iconcaptcha-modal__body-title">${options.messages.correct}</div>` +
+                `<div class="iconcaptcha-modal__body-title">${options.locale.correct}</div>` +
                 `<div class="iconcaptcha-modal__body-checkmark">${checkmarkSVG}</div>` +
                 `<div class='iconcaptcha-modal__body-info'>` +
                 `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>` +
@@ -582,8 +582,8 @@ const IconCaptcha = (function () {
             const captchaSelection = _captchaHolder.querySelector('.iconcaptcha-modal__body-selection');
             unregisterSelectionEvents(captchaSelection);
 
-            topMessage = topMessage || options.messages.incorrect.title;
-            bottomMessage = bottomMessage || options.messages.incorrect.subtitle;
+            topMessage = topMessage || options.locale.incorrect.title;
+            bottomMessage = bottomMessage || options.locale.incorrect.subtitle;
 
             // Add the error message to the element.
             _captchaHolder.classList.add('iconcaptcha-error');
@@ -707,7 +707,7 @@ const IconCaptcha = (function () {
         function processCaptchaRequestError(code, data) {
             switch (code) {
                 case 'too-many-attempts': // Too many incorrect selections, timeout.
-                    showIncorrectIconMessage(options.messages.timeout.title, options.messages.timeout.subtitle, false);
+                    showIncorrectIconMessage(options.locale.timeout.title, options.locale.timeout.subtitle, false);
 
                     // Remove the header from the captcha.
                     const captchaHeader = _captchaHolder.querySelector('.iconcaptcha-modal__header');
@@ -819,7 +819,7 @@ const IconCaptcha = (function () {
 
                     // Display the loading state.
                     _captchaHolder.querySelector('.iconcaptcha-modal__body-circle').style.animationDuration = '2s';
-                    _captchaHolder.querySelector('.iconcaptcha-modal__body-title').innerText = options.messages.initialization.loading;
+                    _captchaHolder.querySelector('.iconcaptcha-modal__body-title').innerText = options.locale.initialization.loading;
 
                     setTimeout(() => {
                         _captchaHolder.classList.remove('iconcaptcha-init');

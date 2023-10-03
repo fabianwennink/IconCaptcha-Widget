@@ -11,17 +11,17 @@ const IconCaptcha = (function () {
     const exports = {};
     const defaults = {
         general: {
-            validationPath: null,
+            endpoint: null,
             fontFamily: null,
             credits: 'show',
         },
         security: {
-            clickDelay: 1500,
-            hoverDetection: true,
-            enableInitialMessage: true,
-            initializeDelay: 500,
-            selectionResetDelay: 3000,
-            loadingAnimationDelay: 1000,
+            interactionDelay: 1500,
+            hoverProtection: true,
+            displayInitialMessage: true,
+            initializationDelay: 500,
+            incorrectSelectionResetDelay: 3000,
+            loadingAnimationDuration: 1000,
         },
         locale: {
             initialization: {
@@ -237,9 +237,9 @@ const IconCaptcha = (function () {
 
         let scriptLoadTime = Date.now();
 
-        // Make sure the validationPath option is set.
-        if (!options.general.validationPath) {
-            setCaptchaError(true, 'IconCaptcha was configured incorrectly', 'The IconCaptcha option `validationPath` has not been set.');
+        // Make sure the server request endpoint option is set.
+        if (!options.general.endpoint) {
+            setCaptchaError(true, 'IconCaptcha was configured incorrectly', 'The IconCaptcha option `general.endpoint` has not been set.');
             return;
         }
 
@@ -266,7 +266,7 @@ const IconCaptcha = (function () {
             }
 
             // If not initialized yet, show the 'initial' captcha holder.
-            if (!startedInitialization && options.security.enableInitialMessage) {
+            if (!startedInitialization && options.security.displayInitialMessage) {
                 registerHolderEvents();
                 buildCaptchaInitialHolder();
                 return;
@@ -280,9 +280,9 @@ const IconCaptcha = (function () {
             // Add the loading spinner.
             addLoadingSpinner();
 
-            // If the loadingAnimationDelay has been set and is not 0, add the loading delay.
-            if (options.security.loadingAnimationDelay && options.security.loadingAnimationDelay > 0 && !options.security.enableInitialMessage) {
-                setTimeout(() => loadCaptcha(captchaTheme), options.security.loadingAnimationDelay);
+            // If the loadingAnimationDuration has been set and is not 0, add the loading delay.
+            if (options.security.loadingAnimationDuration && options.security.loadingAnimationDuration > 0 && !options.security.displayInitialMessage) {
+                setTimeout(() => loadCaptcha(captchaTheme), options.security.loadingAnimationDuration);
             } else {
                 loadCaptcha(captchaTheme);
             }
@@ -305,7 +305,7 @@ const IconCaptcha = (function () {
 
             // Load the captcha data.
             IconCaptchaPolyfills.ajax({
-                url: options.general.validationPath,
+                url: options.general.endpoint,
                 type: 'POST',
                 headers: createHeaders(_captchaToken),
                 data: {payload: requestPayload},
@@ -502,7 +502,7 @@ const IconCaptcha = (function () {
 
                 // Perform the request.
                 IconCaptchaPolyfills.ajax({
-                    url: options.general.validationPath,
+                    url: options.general.endpoint,
                     type: 'POST',
                     headers: createHeaders(_captchaToken),
                     data: {payload: requestPayload},
@@ -599,7 +599,7 @@ const IconCaptcha = (function () {
 
             // Reset the captcha.
             if (reset) {
-                setTimeout(resetCaptchaHolder, options.security.selectionResetDelay);
+                setTimeout(resetCaptchaHolder, options.security.incorrectSelectionResetDelay);
             }
         }
 
@@ -807,7 +807,7 @@ const IconCaptcha = (function () {
          * Registers any event which is linked to the captcha holder element.
          */
         function registerHolderEvents() {
-            if (options.security.enableInitialMessage) {
+            if (options.security.displayInitialMessage) {
                 _captchaHolder.addEventListener('click', function (e) {
 
                     // Prevent initialization if the captcha was initialized, or the info link was clicked.
@@ -824,7 +824,7 @@ const IconCaptcha = (function () {
                     setTimeout(() => {
                         _captchaHolder.classList.remove('iconcaptcha-init');
                         init();
-                    }, options.security.initializeDelay);
+                    }, options.security.initializationDelay);
                 });
             }
         }
@@ -837,11 +837,11 @@ const IconCaptcha = (function () {
             const mouseClickEvent = function (e) {
 
                 // Only allow a user to click after a set click delay.
-                if ((new Date() - generatedInTime) <= options.security.clickDelay)
+                if ((new Date() - generatedInTime) <= options.security.interactionDelay)
                     return;
 
                 // If the cursor is not hovering over the element, return
-                if (options.security.hoverDetection && !hovering)
+                if (options.security.hoverProtection && !hovering)
                     return;
 
                 // Detect if the click coordinates. If not present, it's not a real click.
@@ -857,9 +857,9 @@ const IconCaptcha = (function () {
                 // Trigger: selected
                 IconCaptchaPolyfills.trigger(_captchaHolder, 'selected', {captchaId: _widgetId});
 
-                if (options.security.loadingAnimationDelay && options.security.loadingAnimationDelay > 0) {
+                if (options.security.loadingAnimationDuration && options.security.loadingAnimationDuration > 0) {
                     addLoadingSpinner();
-                    setTimeout(() => submitIconSelection(xPos, yPos), options.security.loadingAnimationDelay);
+                    setTimeout(() => submitIconSelection(xPos, yPos), options.security.loadingAnimationDuration);
                 } else {
                     submitIconSelection(xPos, yPos);
                 }

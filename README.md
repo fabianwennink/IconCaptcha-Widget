@@ -20,10 +20,10 @@
 </p>
 
 <p align="center">
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/alert_status/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Quality" /></a>
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/security_rating/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud&color=%234c1" alt="Sonar Security" /></a>
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/bugs/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Bugs" /></a>
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Plugin-Front-End"><img src="https://img.shields.io/sonar/vulnerabilities/fabianwennink_IconCaptcha-Plugin-Front-End?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Vulnerabilities" /></a>
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/alert_status/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Quality" /></a>
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/security_rating/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud&color=%234c1" alt="Sonar Security" /></a>
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/bugs/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Bugs" /></a>
+    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/vulnerabilities/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Vulnerabilities" /></a>
 </p>
 
 ___

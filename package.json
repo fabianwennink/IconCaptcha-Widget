@@ -1,7 +1,7 @@
 {
-  "name": "iconcaptcha-plugin-front-end",
+  "name": "iconcaptcha-widget",
   "version": "3.1.2",
-  "description": "IconCaptcha is a fast, simple and user-friendly captcha for PHP and ASP.NET.",
+  "description": "IconCaptcha is a self-hosted, customizable, easy-to-implement and user-friendly captcha.",
   "main": "gulpfile.js",
   "scripts": {
     "gulp": "gulp",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fabianwennink/IconCaptcha-Plugin-Front-End.git"
+    "url": "https://github.com/fabianwennink/IconCaptcha-Widget.git"
   },
   "devDependencies": {
     "@babel/core": "^7.14.2",

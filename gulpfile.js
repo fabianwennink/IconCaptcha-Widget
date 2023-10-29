@@ -1,8 +1,8 @@
-/**
- * Icon Captcha Plugin: v3.1.2
- * Copyright © 2023, Fabian Wennink (https://www.fabianwennink.nl)
+/*
+ * IconCaptcha - Copyright 2023, Fabian Wennink (https://www.fabianwennink.nl)
+ * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha-Widget/license
  *
- * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha/license
+ * The above copyright notice and license shall be included in all copies or substantial portions of the software.
  */
 
 const gulp = require('gulp');
@@ -21,7 +21,7 @@ const JS_INPUT = ['src/js/polyfill.js', 'src/js/*.js'];
 const JS_OUTPUT = 'dist/js';
 const FILE_OUTPUT_NAME = 'icon-captcha';
 
-const HEADER = '/*! IconCaptcha v3.1.2 | (c) 2023, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha/license */\n';
+const HEADER = '/*! IconCaptcha v3.1.2 | (c) 2023, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha-Widget/license */\n';
 
 /*************************************************/
 

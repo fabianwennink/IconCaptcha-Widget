@@ -19,7 +19,7 @@ const CSS_INPUT = 'src/scss/*.scss';
 const CSS_OUTPUT = 'dist/css';
 const JS_INPUT = ['src/js/polyfill.js', 'src/js/*.js'];
 const JS_OUTPUT = 'dist/js';
-const FILE_OUTPUT_NAME = 'icon-captcha';
+const FILE_OUTPUT_NAME = 'iconcaptcha';
 
 const HEADER = '/*! IconCaptcha v4.0.0 | (c) 2023, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha-Widget/license */\n';
 

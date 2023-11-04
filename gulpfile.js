@@ -21,7 +21,7 @@ const JS_INPUT = ['src/js/polyfill.js', 'src/js/*.js'];
 const JS_OUTPUT = 'dist/js';
 const FILE_OUTPUT_NAME = 'icon-captcha';
 
-const HEADER = '/*! IconCaptcha v3.1.2 | (c) 2023, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha-Widget/license */\n';
+const HEADER = '/*! IconCaptcha v3.1.3 | (c) 2023, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha-Widget/license */\n';
 
 /*************************************************/
 

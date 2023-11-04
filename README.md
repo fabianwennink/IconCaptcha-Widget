@@ -17,8 +17,6 @@ text images, solve difficult math equations or play any puzzle games. IconCaptch
 
 **This repository contains the front-end source of the IconCaptcha plugins for PHP and ASP.NET. For the installation guide of this package, follow the installation guide of the respective back-end package you want to use.**
 
-<img src="https://i.imgur.com/9RGFZSC.png" title="IconCaptcha" alt="IconCaptcha" />
-
 ___
 
 ## Building the source files
@@ -28,7 +26,7 @@ To build the JavaScript and CSS files, use the included Gulp file (Gulp 4). ECMA
 - To build the source code: ```gulp build```
 
 ## Credits
-The icons used in this project are made by <a href="https://streamlinehq.com" target="_blank" rel="nofollow">Streamline</a>.
+The icons used in this project are made by [BlendIcons](https://blendicons.com/).
 
 ## License
 This project is licensed under the <a href="https://github.com/fabianwennink/jQuery-Icon-Captcha-Plugin/blob/master/LICENSE">MIT</a> license.

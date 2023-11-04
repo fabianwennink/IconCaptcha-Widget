@@ -41,7 +41,7 @@ To build the JavaScript and CSS files, use the included Gulp file (Gulp 4). ECMA
 - To build the source code: ```gulp build```
 
 ## Credits
-The icons used in this project are made by <a href="https://streamlinehq.com" target="_blank" rel="nofollow">Streamline</a>.
+The icons used in this project are made by [BlendIcons](https://blendicons.com/).
 
 ## License
-This project is licensed under the <a href="https://github.com/fabianwennink/jQuery-Icon-Captcha-Plugin/blob/master/LICENSE">MIT</a> license.
+This project is licensed under the [MIT](https://www.fabianwennink.nl/projects/IconCaptcha-Widget/license) license.

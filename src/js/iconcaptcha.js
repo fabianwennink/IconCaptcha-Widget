@@ -14,7 +14,7 @@ const IconCaptcha = (function () {
         general: {
             endpoint: null,
             fontFamily: null,
-            credits: 'show',
+            showCredits: true,
         },
         security: {
             interactionDelay: 1500,
@@ -391,13 +391,18 @@ const IconCaptcha = (function () {
                 "<div class='iconcaptcha-modal'>",
                 "<div class='iconcaptcha-modal__body'>",
                 "<div class='iconcaptcha-modal__body-circle'></div>",
-                "<div class='iconcaptcha-modal__body-info'>",
-                `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>`,
-                "</div>",
                 `<div class='iconcaptcha-modal__body-title'>${options.locale.initialization.verify}</div>`,
                 "</div>",
                 "</div>"
             ];
+
+            // Include the credits.
+            const style = options.general.showCredits ? '' : 'display: none';
+            captchaHTML.splice(4, 0,
+                `<div class='iconcaptcha-modal__body-info' style='${style}'>`,
+                `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>`,
+                "</div>"
+            );
 
             _captchaHolder.classList.add('iconcaptcha-init');
             _captchaHolder.classList.remove('iconcaptcha-error', 'iconcaptcha-success');
@@ -423,13 +428,11 @@ const IconCaptcha = (function () {
                 `<div class='iconcaptcha-modal__footer'>`
             );
 
-            // If the credits option is enabled, push the HTML to the array.
-            if (options.general.credits === 'show' || options.general.credits === 'hide') {
-                const style = (options.general.credits === 'hide') ? 'display: none' : '';
-                captchaHTML.push(
-                    `<span style='${style}'><a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha</a> &copy;</span>`
-                );
-            }
+            // Include the credits.
+            const style = options.general.showCredits ? '' : 'display: none';
+            captchaHTML.push(
+                `<span style='${style}'><a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha</a> &copy;</span>`
+            );
 
             // Adds the first portion of the hidden fields to the array.
             captchaHTML.push("</div>",
@@ -552,16 +555,23 @@ const IconCaptcha = (function () {
             // Add the success message to the element.
             _captchaHolder.classList.add('iconcaptcha-success');
 
-            // Add the success screen to the captcha modal.
-            const captchaModal = _captchaHolder.querySelector('.iconcaptcha-modal');
-            captchaModal.innerHTML +=
+            // Build the widget HTML.
+            let widgetHtml =
                 `<div class="iconcaptcha-modal__body">` +
                 `<div class="iconcaptcha-modal__body-title">${options.locale.correct}</div>` +
-                `<div class="iconcaptcha-modal__body-checkmark">${checkmarkSVG}</div>` +
-                `<div class='iconcaptcha-modal__body-info'>` +
+                `<div class="iconcaptcha-modal__body-checkmark">${checkmarkSVG}</div>`;
+
+            // Include the credits.
+            const style = options.general.showCredits ? '' : 'display: none';
+            widgetHtml += `<div class='iconcaptcha-modal__body-info' style='${style}'>` +
                 `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>` +
-                `</div>` +
                 `</div>`;
+
+            widgetHtml += '</div>';
+
+            // Add the success screen to the captcha modal.
+            const captchaModal = _captchaHolder.querySelector('.iconcaptcha-modal');
+            captchaModal.innerHTML += widgetHtml;
 
             // Mark the captcha as 'not submitting'.
             submitting = false;

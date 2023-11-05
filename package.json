@@ -1,6 +1,6 @@
 {
   "name": "iconcaptcha-widget",
-  "version": "3.1.3",
+  "version": "4.0.0",
   "description": "IconCaptcha is a self-hosted, customizable, easy-to-implement and user-friendly captcha.",
   "main": "gulpfile.js",
   "scripts": {

@@ -12,20 +12,19 @@ const IconCaptcha = (function () {
     const exports = {};
     const defaults = {
         general: {
-            validationPath: null,
+            endpoint: null,
             fontFamily: null,
-            credits: 'show',
+            showCredits: true,
         },
         security: {
-            clickDelay: 1500,
-            hoverDetection: true,
-            enableInitialMessage: true,
-            initializeDelay: 500,
-            selectionResetDelay: 3000,
-            loadingAnimationDelay: 1000,
-            invalidateTime: 1000 * 60 * 2,
+            interactionDelay: 1500,
+            hoverProtection: true,
+            displayInitialMessage: true,
+            initializationDelay: 500,
+            incorrectSelectionResetDelay: 3000,
+            loadingAnimationDuration: 1000,
         },
-        messages: {
+        locale: {
             initialization: {
                 loading: 'Loading challenge...',
                 verify: 'Verify that you are human.'
@@ -37,7 +36,7 @@ const IconCaptcha = (function () {
                 subtitle: "You've selected the wrong image."
             },
             timeout: {
-                title: 'Please wait 60 sec.',
+                title: 'Please wait.',
                 subtitle: 'You made too many incorrect selections.'
             }
         }
@@ -212,17 +211,19 @@ const IconCaptcha = (function () {
     /**
      * Initializes the widget for the specified element.
      * @param {HTMLElement} element The DOM element to generate the widget into.
-     * @param {string} id The index of the widget.
+     * @param {string} id The identifier of the widget.
      * @param {Object} options An object containing the configuration options for the widget.
      * @returns {Object} The initialized captcha widget.
      * @private
      */
     const _initWidget = function (element, id, options) {
 
-        const _captchaId = _captchaId || generateCaptchaId();
         const _captchaHolder = element;
         let _captchaIconHolder;
         let _captchaSelectionCursor;
+
+        let _widgetId;
+        let _challengeId;
         let _captchaToken;
 
         let startedInitialization = false;
@@ -235,9 +236,11 @@ const IconCaptcha = (function () {
         let submitting = false;
         let hovering = false;
 
-        // Make sure the validationPath option is set.
-        if (!options.general.validationPath) {
-            setCaptchaError(true, 'IconCaptcha was configured incorrectly', 'The IconCaptcha option `validationPath` has not been set.');
+        let scriptLoadTime = Date.now();
+
+        // Make sure the server request endpoint option is set.
+        if (!options.general.endpoint) {
+            setCaptchaError(true, 'IconCaptcha was configured incorrectly', 'The IconCaptcha option `general.endpoint` has not been set.');
             return;
         }
 
@@ -248,6 +251,8 @@ const IconCaptcha = (function () {
          * Initializes the plugin.
          */
         function init() {
+
+            _widgetId = _widgetId || generateWidgetId();
 
             // Get the CSRF token, if available.
             _captchaToken = document.querySelector('input[name="_iconcaptcha-token"]')?.value;
@@ -262,7 +267,7 @@ const IconCaptcha = (function () {
             }
 
             // If not initialized yet, show the 'initial' captcha holder.
-            if (!startedInitialization && options.security.enableInitialMessage) {
+            if (!startedInitialization && options.security.displayInitialMessage) {
                 registerHolderEvents();
                 buildCaptchaInitialHolder();
                 return;
@@ -276,9 +281,9 @@ const IconCaptcha = (function () {
             // Add the loading spinner.
             addLoadingSpinner();
 
-            // If the loadingAnimationDelay has been set and is not 0, add the loading delay.
-            if (options.security.loadingAnimationDelay && options.security.loadingAnimationDelay > 0 && !options.security.enableInitialMessage) {
-                setTimeout(() => loadCaptcha(captchaTheme), options.security.loadingAnimationDelay);
+            // If the loadingAnimationDuration has been set and is not 0, add the loading delay.
+            if (options.security.loadingAnimationDuration && options.security.loadingAnimationDuration > 0 && !options.security.displayInitialMessage) {
+                setTimeout(() => loadCaptcha(captchaTheme), options.security.loadingAnimationDuration);
             } else {
                 loadCaptcha(captchaTheme);
             }
@@ -292,13 +297,16 @@ const IconCaptcha = (function () {
         function loadCaptcha(captchaTheme) {
 
             // Create the base64 payload.
-            const requestPayload = createPayload({
-                i: _captchaId, a: 1, t: captchaTheme, tk: _captchaToken
+            const requestPayload = encodePayload({
+                widgetId: _widgetId,
+                action: 'LOAD',
+                theme: captchaTheme,
+                token: _captchaToken,
             });
 
             // Load the captcha data.
             IconCaptchaPolyfills.ajax({
-                url: options.general.validationPath,
+                url: options.general.endpoint,
                 type: 'POST',
                 headers: createHeaders(_captchaToken),
                 data: {payload: requestPayload},
@@ -306,7 +314,10 @@ const IconCaptcha = (function () {
                     if (data && typeof data === 'string') {
 
                         // Decode and parse the response.
-                        const result = JSON.parse(atob(data));
+                        const result = decodePayload(data);
+
+                        // Set the captcha identifier.
+                        _challengeId = result.identifier;
 
                         // If an error message was returned.
                         if (result.error) {
@@ -314,14 +325,22 @@ const IconCaptcha = (function () {
                             return;
                         }
 
-                        // Create the base64 payload.
-                        const imageRequestPayload = createPayload({i: _captchaId, tk: _captchaToken});
-                        const urlParamSeparator = options.general.validationPath.indexOf('?') > -1 ? '&' : '?';
+                        // Check if the challenge was autocompleted on the server.
+                        if(result.completed && !result.challenge) {
+                            clearInvalidationTimeout();
+                            showCompletionMessage();
+                            return;
+                        }
 
-                        // Load the captcha image.
+                        // Update the form fields with the captcha data.
+                        _captchaHolder.querySelector('input[name="ic-cid"]')?.setAttribute('value', _challengeId);
+                        _captchaHolder.querySelector('input[name="ic-wid"]')?.setAttribute('value', _widgetId);
+
+                        // Render the challenge.
                         const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
-                        iconsHolder.style.backgroundImage = `url(${options.general.validationPath}${urlParamSeparator}payload=${imageRequestPayload})`;
-                        removeLoadingSpinnerOnImageLoad(iconsHolder);
+                        renderChallengeOnCanvas(iconsHolder, result.challenge, () => {
+                            removeLoadingSpinner();
+                        });
 
                         // Add the selection area to the captcha holder.
                         iconsHolder.parentNode.insertAdjacentHTML('beforeend', '<div class="iconcaptcha-modal__body-selection"><i></i></div>');
@@ -333,7 +352,7 @@ const IconCaptcha = (function () {
 
                         // Event: init
                         if (!generated) {
-                            IconCaptchaPolyfills.trigger(_captchaHolder, 'init', {captchaId: _captchaId});
+                            IconCaptchaPolyfills.trigger(_captchaHolder, 'init', {captchaId: _widgetId});
                         }
 
                         // Determine the width of the image.
@@ -345,7 +364,10 @@ const IconCaptcha = (function () {
                         generated = true;
 
                         // Start the invalidation timer, save the timer identifier.
-                        invalidateTimeoutId = setTimeout(() => invalidateSession(true), options.security.invalidateTime);
+                        if(result?.expiredAt) {
+                            const expirationTime = result.expiredAt - Date.now(); // calculate the remaining milliseconds.
+                            invalidateTimeoutId = setTimeout(() => invalidate(), expirationTime);
+                        }
 
                         return;
                     }
@@ -356,7 +378,7 @@ const IconCaptcha = (function () {
                         'Invalid data was returned by the captcha back-end service. ' +
                         'Make sure IconCaptcha is installed/configured properly.');
                 },
-                error: () => showIncorrectIconMessage()
+                error: () => processCaptchaRequestError(-1)
             });
         }
 
@@ -369,13 +391,18 @@ const IconCaptcha = (function () {
                 "<div class='iconcaptcha-modal'>",
                 "<div class='iconcaptcha-modal__body'>",
                 "<div class='iconcaptcha-modal__body-circle'></div>",
-                "<div class='iconcaptcha-modal__body-info'>",
-                `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>`,
-                "</div>",
-                `<div class='iconcaptcha-modal__body-title'>${options.messages.initialization.verify}</div>`,
+                `<div class='iconcaptcha-modal__body-title'>${options.locale.initialization.verify}</div>`,
                 "</div>",
                 "</div>"
             ];
+
+            // Include the credits.
+            const style = options.general.showCredits ? '' : 'display: none';
+            captchaHTML.splice(4, 0,
+                `<div class='iconcaptcha-modal__body-info' style='${style}'>`,
+                `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>`,
+                "</div>"
+            );
 
             _captchaHolder.classList.add('iconcaptcha-init');
             _captchaHolder.classList.remove('iconcaptcha-error', 'iconcaptcha-success');
@@ -393,34 +420,33 @@ const IconCaptcha = (function () {
             captchaHTML.push(
                 "<div class='iconcaptcha-modal'>",
                 "<div class='iconcaptcha-modal__header'>",
-                `<span>${options.messages.header}</span>`,
+                `<span>${options.locale.header}</span>`,
                 "</div>",
                 "<div class='iconcaptcha-modal__body'>",
-                "<div class='iconcaptcha-modal__body-icons'></div>",
+                "<canvas class='iconcaptcha-modal__body-icons'></canvas>",
                 "</div>",
                 `<div class='iconcaptcha-modal__footer'>`
             );
 
-            // If the credits option is enabled, push the HTML to the array.
-            if (options.general.credits === 'show' || options.general.credits === 'hide') {
-                const style = (options.general.credits === 'hide') ? 'display: none' : '';
-                captchaHTML.push(
-                    `<span style='${style}'><a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha</a> &copy;</span>`
-                );
-            }
-
-            // Adds the last portion of the HTML to the array.
+            // Include the credits.
+            const style = options.general.showCredits ? '' : 'display: none';
             captchaHTML.push(
-                "</div>",
-                "<div class='iconcaptcha-modal__fields'>",
-                "<input type='hidden' name='ic-hf-se' required />",
-                `<input type='hidden' name='ic-hf-id' value='${_captchaId}' required />`,
-                "<input type='hidden' name='ic-hf-hp' required />",
-                "</div>"
+                `<span style='${style}'><a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha</a> &copy;</span>`
             );
 
+            // Adds the first portion of the hidden fields to the array.
+            captchaHTML.push("</div>",
+                "<div class='iconcaptcha-modal__fields'>",
+                "<input type='hidden' name='ic-rq' value='1' required style='display:none;' />",
+            );
+
+            // Add the remaining hidden fields to the array.
+            for (let field of ['wid', 'cid', 'hp']) {
+                captchaHTML.push(`<input type='hidden' name='ic-${field}' required style='display:none;' />`)
+            }
+
             // Close the holder.
-            captchaHTML.push("</div>");
+            captchaHTML.push("</div></div>");
 
             _captchaHolder.innerHTML = captchaHTML.join('');
             _captchaIconHolder = _captchaHolder.querySelector('.iconcaptcha-modal__body');
@@ -432,17 +458,16 @@ const IconCaptcha = (function () {
          */
         function resetCaptchaHolder() {
             _captchaHolder.classList.remove('iconcaptcha-error');
-            _captchaHolder.querySelector("input[name='ic-hf-se']").setAttribute('value', null);
 
             // Reset the captcha body.
             IconCaptchaPolyfills.empty(_captchaIconHolder);
-            _captchaIconHolder.insertAdjacentHTML('beforeend', "<div class='iconcaptcha-modal__body-icons'></div>");
+            _captchaIconHolder.insertAdjacentHTML('beforeend', "<canvas class='iconcaptcha-modal__body-icons'></canvas>");
 
             // Reload the captcha.
             init();
 
             // Trigger: refreshed
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'refreshed', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'refreshed', {captchaId: _widgetId});
         }
 
         /**
@@ -465,26 +490,40 @@ const IconCaptcha = (function () {
                 xPos = Math.round(xPos);
                 yPos = Math.round(yPos);
 
-                // Update the form fields with the captcha data.
-                _captchaHolder.querySelector('input[name="ic-hf-se"]').setAttribute('value', [xPos, yPos, captchaImageWidth].join(','));
-                _captchaHolder.querySelector('input[name="ic-hf-id"]').setAttribute('value', _captchaId);
-
                 // Hide the mouse cursor.
                 _captchaSelectionCursor.style.display = 'none';
 
                 // Create the base64 payload.
-                const requestPayload = createPayload({
-                    i: _captchaId, x: xPos, y: yPos, w: captchaImageWidth, a: 2, tk: _captchaToken
+                const requestPayload = encodePayload({
+                    widgetId: _widgetId,
+                    challengeId: _challengeId,
+                    action: 'SELECTION',
+                    x: xPos,
+                    y: yPos,
+                    width: captchaImageWidth,
+                    token: _captchaToken,
                 });
 
                 // Perform the request.
                 IconCaptchaPolyfills.ajax({
-                    url: options.general.validationPath,
+                    url: options.general.endpoint,
                     type: 'POST',
                     headers: createHeaders(_captchaToken),
                     data: {payload: requestPayload},
-                    success: () => showCompletionMessage(),
-                    error: () => showIncorrectIconMessage()
+                    success: (response) => {
+
+                        // Decode and parse the response.
+                        const result = decodePayload(response);
+
+                        // In the captcha was not completed.
+                        if(!result.completed) {
+                            showIncorrectIconMessage();
+                            return;
+                        }
+
+                        showCompletionMessage(result)
+                    },
+                    error: () => processCaptchaRequestError(-1)
                 });
             }
         }
@@ -492,13 +531,20 @@ const IconCaptcha = (function () {
         /**
          * Changes the captcha state to the 'success' state. The header, parts of the
          * body and the footer will be replaced with the new success message state.
+         * @param response The captcha selection response.
          */
-        function showCompletionMessage() {
+        function showCompletionMessage(response) {
             _captchaIconHolder.classList.remove('captcha-opacity');
 
             // Unregister the selection events to prevent possible memory leaks.
             const captchaSelection = _captchaHolder.querySelector('.iconcaptcha-modal__body-selection');
             unregisterSelectionEvents(captchaSelection);
+
+            // If the response contains an expiration time, start the timer.
+            if(response?.expiredAt) {
+                const expirationTime = response.expiredAt - Date.now(); // calculate the remaining milliseconds.
+                invalidateTimeoutId = setTimeout(() => invalidate(), expirationTime);
+            }
 
             // Clear the modal, except for the input fields.
             const elements = _captchaHolder.querySelectorAll('.iconcaptcha-modal__header, .iconcaptcha-modal__footer, .iconcaptcha-modal__body');
@@ -509,22 +555,29 @@ const IconCaptcha = (function () {
             // Add the success message to the element.
             _captchaHolder.classList.add('iconcaptcha-success');
 
+            // Build the widget HTML.
+            let widgetHtml =
+                `<div class="iconcaptcha-modal__body">` +
+                `<div class="iconcaptcha-modal__body-title">${options.locale.correct}</div>` +
+                `<div class="iconcaptcha-modal__body-checkmark">${checkmarkSVG}</div>`;
+
+            // Include the credits.
+            const style = options.general.showCredits ? '' : 'display: none';
+            widgetHtml += `<div class='iconcaptcha-modal__body-info' style='${style}'>` +
+                `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>` +
+                `</div>`;
+
+            widgetHtml += '</div>';
+
             // Add the success screen to the captcha modal.
             const captchaModal = _captchaHolder.querySelector('.iconcaptcha-modal');
-            captchaModal.innerHTML +=
-                `<div class="iconcaptcha-modal__body">` +
-                `<div class="iconcaptcha-modal__body-title">${options.messages.correct}</div>` +
-                `<div class="iconcaptcha-modal__body-checkmark">${checkmarkSVG}</div>` +
-                `<div class='iconcaptcha-modal__body-info'>` +
-                `<a href='${homepage}' target='_blank' rel='follow' title='${creditText}'>IconCaptcha &copy;</a>` +
-                `</div>` +
-                `</div>`;
+            captchaModal.innerHTML += widgetHtml;
 
             // Mark the captcha as 'not submitting'.
             submitting = false;
 
             // Trigger: success
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'success', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'success', {captchaId: _widgetId});
         }
 
         /**
@@ -540,8 +593,8 @@ const IconCaptcha = (function () {
             const captchaSelection = _captchaHolder.querySelector('.iconcaptcha-modal__body-selection');
             unregisterSelectionEvents(captchaSelection);
 
-            topMessage = topMessage || options.messages.incorrect.title;
-            bottomMessage = bottomMessage || options.messages.incorrect.subtitle;
+            topMessage = topMessage || options.locale.incorrect.title;
+            bottomMessage = bottomMessage || options.locale.incorrect.subtitle;
 
             // Add the error message to the element.
             _captchaHolder.classList.add('iconcaptcha-error');
@@ -553,11 +606,38 @@ const IconCaptcha = (function () {
             submitting = false;
 
             // Trigger: error
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _widgetId});
 
             // Reset the captcha.
             if (reset) {
-                setTimeout(resetCaptchaHolder, options.security.selectionResetDelay);
+                setTimeout(resetCaptchaHolder, options.security.incorrectSelectionResetDelay);
+            }
+        }
+
+        /**
+         * Renders the challenge image onto the captcha's canvas.
+         * @param holder The captcha element in which the challenge will be rendered.
+         * @param challenge The challenge image, as a base64 string.
+         * @param callback The callback which will be fired when the challenge was rendered.
+         */
+        function renderChallengeOnCanvas(holder, challenge, callback) {
+
+            // Get the dimensions of the captcha challenge holder.
+            const style = window.getComputedStyle(holder);
+            holder.width = style.getPropertyValue('width').replace('px', '');
+            holder.height = style.getPropertyValue('height').replace('px', '')
+
+            // Render the challenge onto the canvas.
+            const image = new Image();
+            image.src = `data:image/png;base64,${challenge}`;
+            image.onload = () => {
+                holder.getContext('2d')?.drawImage(image, 0, 0);
+                callback();
+            };
+
+            // Workaround for IE (IE sometimes doesn't fire onload on cached resources).
+            if (image.complete) {
+                image.onload(this);
             }
         }
 
@@ -580,53 +660,21 @@ const IconCaptcha = (function () {
         }
 
         /**
-         * Removes the loading spinner icon from the captcha holder element when
-         * the background image of the given DOM element is fully loaded.
-         * @param elem The DOM element.
+         * Invalidates the current captcha, resetting the state and rebuilding the captcha holder.
          */
-        function removeLoadingSpinnerOnImageLoad(elem) {
-            const imageUrl = elem.style.backgroundImage.match(/\((.*?)\)/)[1].replace(/(['"])/g, '');
-            const imgObject = new Image();
+        function invalidate() {
 
-            // Listen to the image loading event.
-            imgObject.onload = () => removeLoadingSpinner();
-
-            // Workaround for IE (IE sometimes doesn't fire onload on cached resources).
-            imgObject.src = imageUrl;
-            if (imgObject.complete) {
-                imgObject.onload(this);
-            }
-        }
-
-        /**
-         * Invalidates the current captcha session and resets requests the captcha holder element to be reset.
-         * An AJAX call will be performed to invalidate the session on the server-side, after which the client-side
-         * state will be invalidated and reset.
-         * @param invalidateServer TRUE if the server-side should be invalidated or not, FALSE if not.
-         */
-        function invalidateSession(invalidateServer = true) {
+            _challengeId = undefined;
 
             // Reset the captcha state.
             generated = false;
             startedInitialization = false;
 
-            // Create the base64 payload.
-            if (invalidateServer) {
-                const payload = createPayload({i: _captchaId, a: 3, tk: _captchaToken});
-                IconCaptchaPolyfills.ajax({
-                    url: options.general.validationPath,
-                    type: 'post',
-                    headers: createHeaders(_captchaToken),
-                    data: {payload},
-                    success: function () {
-                        IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _captchaId});
-                        resetCaptchaHolder();
-                    },
-                    error: () => showIncorrectIconMessage()
-                });
-            } else {
-                resetCaptchaHolder();
-            }
+            // Reset the captcha holder.
+            resetCaptchaHolder();
+
+            // Trigger the 'invalidated' event.
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'invalidated', {captchaId: _widgetId});
         }
 
         /**
@@ -644,6 +692,8 @@ const IconCaptcha = (function () {
          */
         function resetCaptcha() {
 
+            _challengeId = undefined;
+
             // Reset the invalidation timer.
             clearInvalidationTimeout();
 
@@ -653,7 +703,7 @@ const IconCaptcha = (function () {
             submitting = false;
             hovering = false;
 
-            IconCaptchaPolyfills.trigger(_captchaHolder, 'reset', {captchaId: _captchaId});
+            IconCaptchaPolyfills.trigger(_captchaHolder, 'reset', {captchaId: _widgetId});
 
             // Re-init the captcha.
             init();
@@ -666,25 +716,23 @@ const IconCaptcha = (function () {
          * @param data The payload of the error.
          */
         function processCaptchaRequestError(code, data) {
-            code = parseInt(code);
-
             switch (code) {
-                case 1: // Too many incorrect selections, timeout.
-                    showIncorrectIconMessage(options.messages.timeout.title, options.messages.timeout.subtitle, false);
+                case 'too-many-attempts': // Too many incorrect selections, timeout.
+                    showIncorrectIconMessage(options.locale.timeout.title, options.locale.timeout.subtitle, false);
 
                     // Remove the header from the captcha.
                     const captchaHeader = _captchaHolder.querySelector('.iconcaptcha-modal__header');
                     captchaHeader.parentNode.removeChild(captchaHeader);
 
                     // Trigger: timeout
-                    IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _captchaId});
+                    IconCaptchaPolyfills.trigger(_captchaHolder, 'timeout', {captchaId: _widgetId});
 
                     // Reset the captcha to the init holder.
-                    setTimeout(() => invalidateSession(false), data);
+                    setTimeout(() => invalidate(), data);
                     break;
-                case 2: // No CSRF token found while validating.
+                case 'invalid-form-token': // No CSRF token found while validating.
                     setCaptchaError(true,
-                        'The captcha token is missing or is incorrect.',
+                        'Captcha form token is missing or incorrect.',
                         'A server request was made without including a captcha token, however this option is enabled.');
                     break;
                 default: // Any other error.
@@ -703,31 +751,52 @@ const IconCaptcha = (function () {
         function setCaptchaError(triggerEvent, displayError, consoleError = '') {
 
             // Display and log the error.
-            showIncorrectIconMessage('IconCaptcha Error', displayError, false);
+            showIncorrectIconMessage('Captcha Error', displayError, false);
             console.error('IconCaptcha Error: ' + (consoleError !== '') ? consoleError : displayError);
 
             // Trigger: error
             if (triggerEvent) {
-                IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _captchaId});
+                IconCaptchaPolyfills.trigger(_captchaHolder, 'error', {captchaId: _widgetId});
             }
         }
 
         /**
-         * Generates a random captcha identifier.
-         * @returns {number} The widget identifier.
+         * Generates a random widget identifier. The identifier follows the UUID v4 format.
+         * Note: While it is not cryptographically secure, when combined with the challenge ID, it provides sufficient randomness.
+         * @returns {string} The widget identifier.
          */
-        function generateCaptchaId() {
-            const maxNumber = Math.pow(10, 13) - 1;
-            return Math.floor(Math.random() * maxNumber);
+        function generateWidgetId() {
+            let uuid = '', random;
+            for (let i = 0; i < 32; i++) {
+                if (i === 8 || i === 12 || i === 16 || i === 20) {
+                    uuid += '-';
+                }
+                random = Math.random() * 16 | 0;
+                uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
+            }
+            return uuid;
         }
 
         /**
-         * Creates a Base64 encoded JSON string from the given data parameter.
+         * Encodes the given payload with base64 and JSON.
          * @param data The payload object to encode.
          * @returns {string} The encoded payload.
          */
-        function createPayload(data) {
-            return btoa(JSON.stringify({...data, ts: Date.now()}));
+        function encodePayload(data) {
+            return btoa(JSON.stringify({
+                ...data,
+                timestamp: Date.now(),
+                initTimestamp: scriptLoadTime
+            }));
+        }
+
+        /**
+         * Tries to decode the given base64 and JSON encoded payload.
+         * @param data The request payload to be decoded.
+         * @return {object} The decoded payload.
+         */
+        function decodePayload(data) {
+            return JSON.parse(atob(data));
         }
 
         /**
@@ -749,7 +818,7 @@ const IconCaptcha = (function () {
          * Registers any event which is linked to the captcha holder element.
          */
         function registerHolderEvents() {
-            if (options.security.enableInitialMessage) {
+            if (options.security.displayInitialMessage) {
                 _captchaHolder.addEventListener('click', function (e) {
 
                     // Prevent initialization if the captcha was initialized, or the info link was clicked.
@@ -761,12 +830,12 @@ const IconCaptcha = (function () {
 
                     // Display the loading state.
                     _captchaHolder.querySelector('.iconcaptcha-modal__body-circle').style.animationDuration = '2s';
-                    _captchaHolder.querySelector('.iconcaptcha-modal__body-title').innerText = options.messages.initialization.loading;
+                    _captchaHolder.querySelector('.iconcaptcha-modal__body-title').innerText = options.locale.initialization.loading;
 
                     setTimeout(() => {
                         _captchaHolder.classList.remove('iconcaptcha-init');
                         init();
-                    }, options.security.initializeDelay);
+                    }, options.security.initializationDelay);
                 });
             }
         }
@@ -779,11 +848,11 @@ const IconCaptcha = (function () {
             const mouseClickEvent = function (e) {
 
                 // Only allow a user to click after a set click delay.
-                if ((new Date() - generatedInTime) <= options.security.clickDelay)
+                if ((new Date() - generatedInTime) <= options.security.interactionDelay)
                     return;
 
                 // If the cursor is not hovering over the element, return
-                if (options.security.hoverDetection && !hovering)
+                if (options.security.hoverProtection && !hovering)
                     return;
 
                 // Detect if the click coordinates. If not present, it's not a real click.
@@ -797,11 +866,11 @@ const IconCaptcha = (function () {
                     return;
 
                 // Trigger: selected
-                IconCaptchaPolyfills.trigger(_captchaHolder, 'selected', {captchaId: _captchaId});
+                IconCaptchaPolyfills.trigger(_captchaHolder, 'selected', {captchaId: _widgetId});
 
-                if (options.security.loadingAnimationDelay && options.security.loadingAnimationDelay > 0) {
+                if (options.security.loadingAnimationDuration && options.security.loadingAnimationDuration > 0) {
                     addLoadingSpinner();
-                    setTimeout(() => submitIconSelection(xPos, yPos), options.security.loadingAnimationDelay);
+                    setTimeout(() => submitIconSelection(xPos, yPos), options.security.loadingAnimationDuration);
                 } else {
                     submitIconSelection(xPos, yPos);
                 }
@@ -870,7 +939,7 @@ const IconCaptcha = (function () {
         }
 
         return {
-            id: _captchaId,
+            id: _widgetId,
             element: element,
             reset: resetCaptcha,
         };

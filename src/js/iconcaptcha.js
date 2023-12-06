@@ -357,7 +357,7 @@ const IconCaptcha = (function () {
 
                         // Determine the width of the image.
                         const modalSelection = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-selection');
-                        captchaImageWidth = IconCaptchaPolyfills.width(modalSelection);
+                        captchaImageWidth = Math.round(IconCaptchaPolyfills.width(modalSelection));
 
                         // Set the building timestamp.
                         generatedInTime = new Date();

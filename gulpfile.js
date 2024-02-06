@@ -1,5 +1,5 @@
 /*
- * IconCaptcha - Copyright 2023, Fabian Wennink (https://www.fabianwennink.nl)
+ * IconCaptcha - Copyright 2017-2024, Fabian Wennink (https://www.fabianwennink.nl)
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha-Widget/license
  *
  * The above copyright notice and license shall be included in all copies or substantial portions of the software.
@@ -21,7 +21,7 @@ const JS_INPUT = ['src/js/polyfill.js', 'src/js/*.js'];
 const JS_OUTPUT = 'dist/js';
 const FILE_OUTPUT_NAME = 'iconcaptcha';
 
-const HEADER = '/*! IconCaptcha v4.0.1 | (c) 2023, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha-Widget/license */\n';
+const HEADER = '/*! IconCaptcha v4.0.2 | (c) 2017-2024, Fabian Wennink (fabianwennink.nl) | fabianwennink.nl/projects/IconCaptcha-Widget/license */\n';
 
 /*************************************************/
 

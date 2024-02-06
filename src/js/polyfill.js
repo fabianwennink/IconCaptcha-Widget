@@ -1,5 +1,5 @@
 /*
- * IconCaptcha - Copyright 2023, Fabian Wennink (https://www.fabianwennink.nl)
+ * IconCaptcha - Copyright 2017-2024, Fabian Wennink (https://www.fabianwennink.nl)
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha-Widget/license
  *
  * The above copyright notice and license shall be included in all copies or substantial portions of the software.

@@ -1,5 +1,5 @@
 /*
- * IconCaptcha - Copyright 2023, Fabian Wennink (https://www.fabianwennink.nl)
+ * IconCaptcha - Copyright 2017-2024, Fabian Wennink (https://www.fabianwennink.nl)
  * Licensed under the MIT license: https://www.fabianwennink.nl/projects/IconCaptcha-Widget/license
  *
  * The above copyright notice and license shall be included in all copies or substantial portions of the software.
@@ -45,6 +45,7 @@ const IconCaptcha = (function () {
     const homepage = 'https://www.fabianwennink.nl/projects/IconCaptcha';
     const creditText = 'IconCaptcha by Fabian Wennink';
     const checkmarkSVG = '<svg viewBox="0 0 98.5 98.5" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path class="checkmark" d="M81.7 17.8C73.5 9.3 62 4 49.2 4 24.3 4 4 24.3 4 49.2s20.3 45.2 45.2 45.2 45.2-20.3 45.2-45.2c0-8.6-2.4-16.6-6.5-23.4L45.6 68.2 24.7 47.3" fill="none" stroke-miterlimit="10" stroke-width="8"/></svg>';
+    const challengeDimension = { width: 320, height: 50 };
 
     /**
      * Initializes an IconCaptcha instance, called via jQuery hook.
@@ -337,13 +338,13 @@ const IconCaptcha = (function () {
                         _captchaHolder.querySelector('input[name="ic-wid"]')?.setAttribute('value', _widgetId);
 
                         // Render the challenge.
-                        const iconsHolder = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
-                        renderChallengeOnCanvas(iconsHolder, result.challenge, () => {
+                        const challengeCanvas = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-icons');
+                        renderChallengeOnCanvas(challengeCanvas, result.challenge, () => {
                             removeLoadingSpinner();
                         });
 
                         // Add the selection area to the captcha holder.
-                        iconsHolder.parentNode.insertAdjacentHTML('beforeend', '<div class="iconcaptcha-modal__body-selection"><i></i></div>');
+                        challengeCanvas.parentNode.insertAdjacentHTML('beforeend', '<div class="iconcaptcha-modal__body-selection"><i></i></div>');
                         _captchaSelectionCursor = _captchaIconHolder.querySelector('.iconcaptcha-modal__body-selection > i');
 
                         // Register the events.
@@ -616,22 +617,41 @@ const IconCaptcha = (function () {
 
         /**
          * Renders the challenge image onto the captcha's canvas.
-         * @param holder The captcha element in which the challenge will be rendered.
+         * @param canvas The canvas element in which the challenge will be rendered.
          * @param challenge The challenge image, as a base64 string.
          * @param callback The callback which will be fired when the challenge was rendered.
          */
-        function renderChallengeOnCanvas(holder, challenge, callback) {
+        function renderChallengeOnCanvas(canvas, challenge, callback) {
 
-            // Get the dimensions of the captcha challenge holder.
-            const style = window.getComputedStyle(holder);
-            holder.width = style.getPropertyValue('width').replace('px', '');
-            holder.height = style.getPropertyValue('height').replace('px', '')
+            // Get the calculated dimensions of the challenge canvas.
+            const style = window.getComputedStyle(canvas);
+            const width = parseInt(style?.getPropertyValue('width')?.replace('px', ''));
+            const height = parseInt(style?.getPropertyValue('height')?.replace('px', ''));
+            const smallerThanDefaultWidth = width < challengeDimension.width;
+
+            // Calculate the height of the challenge based on its width.
+            // This only has to be done if the width is less than the default size.
+            const challengeHeight = smallerThanDefaultWidth
+                ? width / (challengeDimension.width / challengeDimension.height)
+                : height;
+
+            // Set the canvas dimensions to fixed values.
+            canvas.width = width;
+            canvas.style.width = `${width}px`;
+            canvas.height = challengeHeight
+            canvas.style.height = `${challengeHeight}px`;
+
+            // Apply spacing correction for smaller challenges.
+            if (smallerThanDefaultWidth) {
+                const additionalSpacing = Math.round((height - challengeHeight) / 2);
+                canvas.style.marginTop = `${additionalSpacing}px`;
+            }
 
             // Render the challenge onto the canvas.
             const image = new Image();
             image.src = `data:image/png;base64,${challenge}`;
             image.onload = () => {
-                holder.getContext('2d')?.drawImage(image, 0, 0);
+                canvas.getContext('2d')?.drawImage(image, 0, 0, width, challengeHeight);
                 callback();
             };
 

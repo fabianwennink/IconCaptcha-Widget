@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Osborn Security: download</title>
+<style>
+:root{--bg:#1b1230;--card:#2b1d4a;--ink:#fff;--mut:#cbbfe6;--accent:#ff8c1a}
+@media (prefers-color-scheme: light){:root{--bg:#f6f2ff;--card:#fff;--ink:#1b1230;--mut:#5b4d7a}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:32px 16px}
+h1{margin:0 0 4px}.sub{color:var(--mut);margin:0 0 24px}
+.card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:16px}
+.btn{display:inline-block;background:var(--accent);color:#1b1230;font-weight:700;text-decoration:none;padding:14px 22px;border-radius:10px;font-size:18px}
+ol{padding-left:20px}li{margin:8px 0}code{background:rgba(127,127,127,.2);padding:1px 6px;border-radius:4px}
+small{color:var(--mut)}
+</style></head><body><main>
+<h1>Osborn Security</h1>
+<p class="sub">A fictional security check that makes you solve one of five silly CAPTCHAs every time the page changes. Hackathon demo.</p>
+<div class="card"><a class="btn" href="goblin-chaos-extension.zip" download>Download extension</a>
+<p><small>Chrome only. Free. It reads, stores and sends nothing from the pages you visit.</small></p></div>
+<div class="card"><h2>Install in 3 steps</h2><ol>
+<li>Open the downloaded zip and choose <b>Extract All</b> (Mac: double-click it).</li>
+<li>In Chrome, type <code>chrome://extensions</code> in the address bar, turn on <b>Developer mode</b> (top right), click <b>Load unpacked</b>, and pick the <code>goblin-chaos-extension</code> folder.</li>
+<li>Open any website (or refresh one that's already open). The goblin appears.</li></ol>
+<p><small>Turn it off: click "Turn off everywhere" (Alt+Shift+G turns it back on), or switch it off on the extensions page.<br>Not showing up? Pick the folder that contains <code>manifest.json</code>, then refresh the page.</small></p></div>
+<p><small>Built on <a href="https://github.com/fabianwennink/IconCaptcha-PHP" style="color:inherit">IconCaptcha</a> (MIT).</small></p>
+</main></body></html>

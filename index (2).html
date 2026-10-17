@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Osborn Security</title>
+<link rel="stylesheet" href="captcha.css">
+</head>
+<body>
+<div class="card">
+  <div class="head"><small>Select the missing word to continue</small><b>Verify you are human</b></div>
+  <div class="body">
+    <p class="hint">You have one attempt.</p>
+    <div id="board"></div>
+    <div class="row" id="guess"></div>
+    <button class="check" id="go" disabled>
+      <span class="box" id="box"></span><span class="lbl">I’m not a robot</span>
+    </button>
+    <div class="msg" id="msg"></div>
+    <div class="leg"><b style="color:var(--green)">Green</b>: correct spot &middot; <b style="color:var(--yellow)">Gold</b>: wrong spot &middot; <b>Gray</b>: not in word</div>
+  </div>
+  <div class="foot">
+    <span class="brand"><svg width="26" height="26" viewBox="-8 -8 116 116" aria-hidden="true"><path d="M66.50 78.58A33 33 0 0 1 17 50" stroke="#14532d" stroke-width="16" fill="none"/><path d="M17 50A33 33 0 0 1 50 17" stroke="#5b21b6" stroke-width="16" fill="none"/><path d="M50 17A33 33 0 0 1 82.50 55.73" stroke="#14532d" stroke-width="16" fill="none"/><polygon points="25,50 -1,50 25,28" fill="#14532d"/><polygon points="50,9 50,35 72,9" fill="#5b21b6"/><polygon points="74.62,54.34 100.23,58.86 70.80,76.01" fill="#14532d"/></svg><span><span style="color:#14532d">OSBORN</span> <span style="color:#5b21b6">SECURITY</span></span></span>
+    <span>Privacy &middot; Terms</span>
+  </div>
+</div>
+<script src="captcha.js"></script>
+<script src="../bridge.js"></script>
+</body>
+</html>

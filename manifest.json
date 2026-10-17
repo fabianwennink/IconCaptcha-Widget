@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Osborn Security (hackathon demo)",
+  "version": "0.1.0",
+  "description": "Draws a fictional Osborn Security CAPTCHA over web pages. Reads nothing, stores nothing from the page, sends nothing.",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "src/osborn.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/*",
+        "captchas/*"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+  ],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
+  "permissions": [
+    "storage"
+  ]
+}

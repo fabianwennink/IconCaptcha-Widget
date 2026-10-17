@@ -1,47 +1,19 @@
-<br/>
+# Osborn Security extension
 
-<p align="center">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://i.imgur.com/k8sIUQI.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://i.imgur.com/RMUALSz.png">
-      <img alt="IconCaptcha Logo" src="https://i.imgur.com/RMUALSz.png">
-    </picture>
-</p>
+**Run it:** `chrome://extensions` > Developer mode > Load unpacked > pick this `extension` folder, then refresh any web page.
+After changing anything in this folder, click Reload on the extension card and refresh the page.
 
-<p align="center">
-    <strong>A self-hosted, customizable, easy-to-implement and user-friendly captcha.</strong>
-</p>
+**Captchas (the one folder):** `captchas/<name>/` with `index.html`, `captcha.js`, `captcha.css`.
+Each `index.html` ends with `<script src="../bridge.js"></script>`, which tells the overlay pass ("msg ok") or fail ("msg no").
+The menu list is `src/challenges/index.js`. To add a captcha: add its folder here, add the bridge line, add one line to that list.
+You can still open any captcha's `index.html` on its own in a browser to work on it.
 
-<p align="center">
-    <a href="https://github.com/fabianwennink/IconCaptcha-Plugin-Front-End/releases"><img src="https://img.shields.io/badge/version-4.0.2-orange.svg?style=flat-square" alt="Version" /></a>
-    <a href="https://fabianwennink.nl/projects/IconCaptcha/license"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License" /></a>
-    <a href="https://paypal.me/nlgamevideosnl"><img src="https://img.shields.io/badge/support-PayPal-lightblue.svg?style=flat-square" alt="Support via PayPal" /></a>
-    <a href="https://www.buymeacoffee.com/fabianwennink"><img src="https://img.shields.io/badge/support-Buy_Me_A_Coffee-lightblue.svg?style=flat-square" alt="Buy me a coffee" /></a>
-</p>
+**Dr. Osborn (mascot):** `src/osborn.js` is Steven's file, unchanged, loaded by `manifest.json`. The overlay calls his
+hooks: a new page = `captchaOpened`, a fail = `captchaFailed`, a pass = `captchaPassed`, turning off = `captchaClosed`.
+This copy has two marked edits (search "[extension edit]"): he is 50% bigger with his speech bubble above his head (so it never covers the centered card), and his level is kept in extension storage so it
+carries across all pages and websites (it still resets after 30 quiet minutes, his own rule). If Steven updates him, re-apply those edits.
 
-<p align="center">
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/alert_status/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Quality" /></a>
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/security_rating/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud&color=%234c1" alt="Sonar Security" /></a>
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/bugs/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Bugs" /></a>
-    <a href="https://sonarcloud.io/dashboard?id=fabianwennink_IconCaptcha-Widget"><img src="https://img.shields.io/sonar/vulnerabilities/fabianwennink_IconCaptcha-Widget?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarcloud" alt="Sonar Vulnerabilities" /></a>
-</p>
+**Optional server** (`../server`, uses IconCaptcha's PHP library, MIT): `cd ../server && composer install && php -S localhost:8000 -t public`.
+Without it the overlay still works and lets people through after a pass.
 
-___
-
-Introducing IconCaptcha, a self-hosted captcha solution that's designed to be fast, user-friendly, and highly customizable. Unlike other captchas, IconCaptcha spares users the need of deciphering hard-to-read text images, solving complex math problems, or engaging with perplexing puzzle games. Instead, it's as straightforward as comparing up to 8 icons and selecting the least common one.
-
-This repository contains the source for the IconCaptcha client-side widget, and is to be used in combination with a server-side implementation. To implement IconCaptcha on your website, follow the installation guide of the respective server-side package you wish to use.
-
-___
-
-## Building the source files
-To build the JavaScript and CSS files, use the included Gulp file (Gulp 4). ECMAScript 6 and later is supported.
-
-- To watch the JavaScript and SCSS files: ```gulp watch```
-- To build the source code: ```gulp build```
-
-## Credits
-The icons used in this project are made by [BlendIcons](https://blendicons.com/).
-
-## License
-This project is licensed under the [MIT](https://www.fabianwennink.nl/projects/IconCaptcha-Widget/license) license.
+**Download button:** after changes, re-zip this folder as `goblin-chaos-extension` into `docs/goblin-chaos-extension.zip`.

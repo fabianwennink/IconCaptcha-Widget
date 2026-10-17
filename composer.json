@@ -1,0 +1,5 @@
+{
+  "name": "osborn/goblin-gate-server",
+  "description": "Optional server for the Goblin Chaos extension (uses IconCaptcha, MIT)",
+  "require": { "fabianwennink/iconcaptcha": "^4.0" }
+}
